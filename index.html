@@ -1068,10 +1068,22 @@ const focus = V3(0, 0, 0), camDir = V3(0, 0, 0);
 function updateShadow(){
   if (controls.enabled) focus.copy(controls.target);
   else { camera.getWorldDirection(camDir); focus.copy(camera.position).addScaledVector(camDir, 50); }
-  const half = THREE.MathUtils.clamp(camera.position.distanceTo(focus) * 0.75, 25, 420), sc = sun.shadow.camera;
-  if (Math.abs(sc.right - half) > half*0.08){ sc.left = sc.bottom = -half; sc.right = sc.top = half; sc.updateProjectionMatrix(); }
-  focus.y = 0; sun.target.position.copy(focus); sun.position.copy(focus).addScaledVector(curSun, 1500);
+  const dist = camera.position.distanceTo(focus);
+  // plano próximo/distante acompanham a distância: evita listras (z-fighting) entre chão, ruas e água ao mover o mapa
+  const near = THREE.MathUtils.clamp(dist * 0.004, 0.3, 25), far = THREE.MathUtils.clamp(dist * 9, 14000, 20000);
+  if (Math.abs(camera.near - near) > near*0.15 || Math.abs(camera.far - far) > far*0.15){ camera.near = near; camera.far = far; camera.updateProjectionMatrix(); }
+  // caixa de sombra em degraus fixos (sem "pulsar") e presa à grade de texels (sem tremer ao arrastar)
+  const want = THREE.MathUtils.clamp(dist * 0.75, 25, 420), half = Math.pow(2, Math.ceil(Math.log2(want))), sc = sun.shadow.camera;
+  if (sc.right !== half){ sc.left = sc.bottom = -half; sc.right = sc.top = half; sc.updateProjectionMatrix(); }
+  const texel = 2*half / sun.shadow.mapSize.x;
+  sun.shadow.normalBias = Math.max(0.6, texel * 1.6);
+  focus.y = 0;
+  shR.crossVectors(UP_Y, curSun).normalize(); shU.crossVectors(curSun, shR);
+  const fr = focus.dot(shR), fu = focus.dot(shU);
+  focus.addScaledVector(shR, Math.round(fr / texel) * texel - fr).addScaledVector(shU, Math.round(fu / texel) * texel - fu);
+  sun.target.position.copy(focus); sun.position.copy(focus).addScaledVector(curSun, 1500);
 }
+const shR = V3(0, 0, 0), shU = V3(0, 0, 0), UP_Y = V3(0, 1, 0);
 const bussola = document.querySelector('#bussola svg');
 const NORTH = (() => { const c = Math.cos(-ANG), s = Math.sin(-ANG); return V3(s, 0, -c); })();   // (0,-1) do mapa girado
 let frame = 0;
