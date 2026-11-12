@@ -29,6 +29,8 @@
   .label.rail { background:rgba(200,107,60,.92); }
   .label.road { background:rgba(40,60,80,.85); font-weight:500; }
   .label.cla { background:rgba(30,60,110,.9); }
+  .label.metro { background:rgba(30,91,216,.92); }
+  .label.metro.prev { background:rgba(79,141,255,.85); color:#06142c; }
   .label.cla.big { background:rgba(70,120,200,.95); color:#fff; }
   #hide { position:fixed; right:16px; top:16px; }
   #bussola { position:fixed; right:22px; bottom:22px; width:64px; height:64px; border-radius:50%; background:var(--panel);
@@ -43,6 +45,7 @@
 <script src="costa.js"></script>
 <script src="cena.js"></script>
 <script src="cla.js"></script>
+<script src="metro.js"></script>
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
@@ -84,7 +87,9 @@
     <span style="background:#c9c6bf"></span>Ponte/viadutos &nbsp;
     <span style="background:var(--rail)"></span>Ferrovia &nbsp;
     <span style="background:#5b5f66"></span>Ruas (OSM) &nbsp;
-    <span style="background:#e8e2d6"></span>Prédios (OSM)
+    <span style="background:#e8e2d6"></span>Prédios (OSM)<br>
+    <span style="background:#1e5bd8"></span>Av. Metropolitana (pronta) &nbsp;
+    <span style="background:repeating-linear-gradient(90deg,#4f8dff 0 4px,transparent 4px 6px)"></span>Trecho previsto (aproximado)
   </div>
   <div class="btns">
     <button id="tTrem" class="on">Trem</button>
@@ -97,6 +102,7 @@
     <button data-view="vao">Vão estaiado</button>
     <button data-view="sl">Cabeceira São Luís</button>
     <button data-view="al">Cabeceira Alcântara</button>
+    <button data-view="metro">Av. Metropolitana</button>
     <button data-view="sobrevoo">Sobrevoo</button>
     <button data-view="dirigir">Dirigir</button>
     <button data-view="trem">Seguir o trem</button>
@@ -740,6 +746,31 @@ addLabel('Telemedidas e rastreio', V3(TELE[0], 3, TELE[1]), 'cla', scene, 300);
 // ============ Rótulos ============
 addLabel('São Luís · Ponta d\'Areia', V3(HALF + 70, 32, -40), 'big');
 addLabel('Alcântara', V3(P.alcantara[0], 26, P.alcantara[1]), 'big');
+// ============ Av. Metropolitana / Corredor Metropolitano (PAC) ============
+const MET = window.METRO, mLL = l => l.map(([a, b]) => LL(a, b));
+const metroFeito = MET.feito.map(mLL), metroPrev = mLL(MET.previsto);
+{
+  const mat = c => new THREE.MeshStandardMaterial({ color:c, roughness:0.7, emissive:c, emissiveIntensity:0.25, polygonOffset:true, polygonOffsetFactor:-4, polygonOffsetUnits:-4 });
+  scene.add(new THREE.Mesh(ribbons(metroFeito.map(pts => ({ pts })), () => 3.2, () => GROUND + 0.08), mat(0x1e5bd8)));
+  // trecho previsto: tracejado (traços de ~120 m com vãos de ~60 m)
+  const dashes = [];
+  let acc = 0;
+  for (let i=0;i<metroPrev.length-1;i++){
+    const [ax, az] = metroPrev[i], [bx, bz] = metroPrev[i+1], L = Math.hypot(bx-ax, bz-az);
+    for (let t=0;t<L;){
+      const ph = acc % 18, on = ph < 12, step = Math.min(on ? 12-ph : 18-ph, L-t);
+      if (on) dashes.push({ pts:[[ax+(bx-ax)*t/L, az+(bz-az)*t/L], [ax+(bx-ax)*(t+step)/L, az+(bz-az)*(t+step)/L]] });
+      t += step; acc += step;
+    }
+  }
+  scene.add(new THREE.Mesh(ribbons(dashes, () => 2.8, () => GROUND + 0.08), mat(0x4f8dff)));
+  const a = metroFeito.flat(), mid = a[Math.round(a.length*0.62)], pm = metroPrev[Math.floor(metroPrev.length/2)];
+  addLabel('Av. Metropolitana · trecho pronto', V3(mid[0], 6, mid[1]), 'metro', scene, 2600);
+  addLabel('Corredor Metropolitano · trecho previsto (traçado aproximado)', V3(pm[0], 6, pm[1]), 'metro prev', scene, 2600);
+  const ini = LL(...MET.inicio), fim = LL(...MET.fim);
+  addLabel('BR‑135 · Vila Funil', V3(ini[0], 5, ini[1]), 'road', scene, 2000);
+  addLabel('MA‑203 × MA‑204 · Araçagy', V3(fim[0], 5, fim[1]), 'road', scene, 2000);
+}
 addLabel('Av. dos Holandeses (MA‑203)', V3(P.holandeses[0] + 25, 6, P.holandeses[1] + 10), 'road', scene, 1800);
 addLabel('Anel do Contorno · MA‑106', V3(P.anel[0], 6, P.anel[1]), 'road', scene, 1800);
 addLabel('Via nova · 2,8 km', V3((P.anel[0] - HALF - 30)/2, 5, P.anel[1]/2), 'road', scene, 1800);
@@ -783,6 +814,9 @@ const views = {
   sl:     { pos:[HALF - 60, 45, 90], target:[(HALF + H[0])/2, 2, H[1]/2] },
   al:     { pos:[-HALF + 60, 70, -SIDE*140], target:[-HALF - 120, 1, 0] },
   cla:    { pos:claMid.clone().addScaledVector(toBridge, 650).setY(420).toArray(), target:claMid.toArray() },
+  metro:  (() => { const pts = [...metroFeito.flat(), ...metroPrev], c = pts.reduce((s, p) => [s[0]+p[0]/pts.length, s[1]+p[1]/pts.length], [0, 0]);
+            const s0 = LL(-2.50, -44.20), s1 = LL(-2.60, -44.20), L = Math.hypot(s1[0]-s0[0], s1[1]-s0[1]), sx = (s1[0]-s0[0])/L, sz = (s1[1]-s0[1])/L;
+            return { pos:[c[0] + sx*1500, 1500, c[1] + sz*1500], target:[c[0], 0, c[1]] }; })(),
   pad:    { pos:[padCam.x, 6, padCam.z], target:[PAD[0], 1.6, PAD[1]] },
 };
 function setView(name){
