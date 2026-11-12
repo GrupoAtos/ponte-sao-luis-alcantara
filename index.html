@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponte São Luís–Alcântara</title>
+<style>
+  :root { --bg:#0b1620; --panel:rgba(10,20,30,.80); --text:#eef4f8; --muted:#9db3c4; --accent:#ffb347; --rail:#c86b3c; }
+  html,body { margin:0; height:100%; overflow:hidden; background:var(--bg); color:var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #app { position:fixed; inset:0; }
+  .panel { position:fixed; left:16px; top:16px; width:350px; max-height:calc(100% - 32px); overflow:auto; background:var(--panel);
+    backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:14px 16px; font-size:12.5px; line-height:1.45; }
+  .panel h1 { font-size:17px; margin:0 0 2px; }
+  .panel h2 { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--accent); margin:12px 0 4px; }
+  .panel .sub { color:var(--muted); margin:0 0 6px; }
+  .panel dl { display:grid; grid-template-columns:auto 1fr; gap:2px 10px; margin:0; }
+  .panel dt { color:var(--muted); } .panel dd { margin:0; }
+  .btns { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  button, .link { background:#1d3346; color:var(--text); border:1px solid rgba(255,255,255,.12); border-radius:8px;
+    padding:6px 10px; font-size:12px; cursor:pointer; text-decoration:none; display:inline-block; }
+  button:hover, button.on, .link:hover { background:var(--accent); color:#1a1a1a; }
+  .link { background:#2b4a2e; }
+  .note { color:var(--muted); font-size:11px; margin-top:10px; }
+  .legend span { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px; }
+  .label { color:#fff; font-size:11.5px; font-weight:600; padding:3px 8px; border-radius:6px;
+    background:rgba(0,0,0,.55); white-space:nowrap; pointer-events:none; }
+  .label.big { font-size:14px; background:rgba(255,179,71,.9); color:#1a1a1a; }
+  .label.rail { background:rgba(200,107,60,.92); }
+  .label.road { background:rgba(40,60,80,.85); font-weight:500; }
+  .label.cla { background:rgba(30,60,110,.9); }
+  .label.cla.big { background:rgba(70,120,200,.95); color:#fff; }
+  #hide { position:fixed; right:16px; top:16px; }
+  #bussola { position:fixed; right:22px; bottom:22px; width:64px; height:64px; border-radius:50%; background:var(--panel);
+    border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(6px); pointer-events:none; }
+  #bussola svg { width:100%; height:100%; transition:transform .08s linear; }
+  #carregando { position:fixed; inset:0; display:grid; place-items:center; background:var(--bg); z-index:10; font-size:14px;
+    color:var(--muted); transition:opacity .6s; }
+  #carregando b { display:block; color:var(--text); font-size:18px; margin-bottom:6px; text-align:center; }
+  .panel hr { border:0; border-top:1px solid rgba(255,255,255,.08); margin:12px 0 0; }
+  @media (max-width:600px){ .panel{ right:16px; width:auto; font-size:12px; max-height:45%; } #bussola{ width:48px; height:48px; } }
+</style>
+<script src="costa.js"></script>
+<script src="cena.js"></script>
+<script src="cla.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div class="panel" id="panel">
+  <h1>Ponte São Luís – Alcântara</h1>
+  <p class="sub">Estudo conceitual 3D · ponte rodoferroviária sobre a Baía de São Marcos</p>
+
+  <h2>Ponte principal</h2>
+  <dl>
+    <dt>São Luís</dt><dd>Ponta d'Areia / São Marcos → rotatória da <b>Av. dos Holandeses (MA‑203)</b> por rampa de 310 m</dd>
+    <dt>Alcântara</dt><dd>Margem leste → via nova de 2,8 km até o <b>Anel do Contorno / MA‑106</b>, sem cruzar o centro histórico</dd>
+    <dt>Extensão</dt><dd>12,7 km sobre a água</dd>
+    <dt>Seção</dt><dd>4 faixas rodoviárias + 2 linhas de trem de passageiros</dd>
+    <dt>Vão central</dt><dd>700 m estaiado · gabarito 80 m · torres de 240 m</dd>
+  </dl>
+
+  <h2>Trem</h2>
+  <dl>
+    <dt>Linha</dt><dd>Passageiros: estação elevada na cabeceira de São Luís ↔ estação de Alcântara</dd>
+    <dt>Tempo</dt><dd>~15 km · cerca de 12 min</dd>
+  </dl>
+
+  <h2>Base de Alcântara (CLA)</h2>
+  <dl>
+    <dt>O que é</dt><dd>Centro de Lançamento de Alcântara, da Força Aérea Brasileira</dd>
+    <dt>Na maquete</dt><dd>Perímetro, pista 09/27 de 2,6 km, Torre Móvel de Integração (~33 m), casamata, para‑raios, prédios técnicos e estradas internas, nas posições do OSM</dd>
+    <dt>Distâncias</dt><dd>Cabeceira da ponte a 1,2 km do perímetro e ~10 km da plataforma · a via nova não entra na base</dd>
+  </dl>
+  <div class="btns"><button id="lancar">Lançar foguete</button></div>
+
+  <h2>Camadas</h2>
+  <div class="legend">
+    <span style="background:#c9c6bf"></span>Ponte/viadutos &nbsp;
+    <span style="background:var(--rail)"></span>Ferrovia &nbsp;
+    <span style="background:#5b5f66"></span>Ruas (OSM) &nbsp;
+    <span style="background:#e8e2d6"></span>Prédios (OSM)
+  </div>
+  <div class="btns">
+    <button id="tTrem" class="on">Trem</button>
+    <button id="noite">Noite</button>
+  </div>
+
+  <h2>Câmera</h2>
+  <div class="btns">
+    <button data-view="geral" class="on">Visão geral</button>
+    <button data-view="vao">Vão estaiado</button>
+    <button data-view="sl">Cabeceira São Luís</button>
+    <button data-view="al">Cabeceira Alcântara</button>
+    <button data-view="sobrevoo">Sobrevoo</button>
+    <button data-view="dirigir">Dirigir</button>
+    <button data-view="trem">Seguir o trem</button>
+    <button data-view="cla">Base de Alcântara</button>
+    <button data-view="pad">Plataforma de lançamento</button>
+  </div>
+
+  <div class="btns" style="margin-top:12px"><a class="link" href="estudo.html" target="_blank">Abrir estudo: orçamento, economia e casos no mundo →</a></div>
+  <p class="note">Arraste para girar · roda para zoom · botão direito para mover.<br>
+  Litoral, ruas, trilhos e prédios © OpenStreetMap (ODbL). Alturas de prédios sem dado no OSM são estimadas.
+  Maquete conceitual — não é projeto de engenharia.</p>
+</div>
+<button id="hide">Ocultar painel</button>
+<div id="bussola"><svg viewBox="0 0 64 64"><polygon points="32,8 38,32 32,28 26,32" fill="#ff6b5a"/><polygon points="32,56 38,32 32,36 26,32" fill="#9db3c4"/><text x="32" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#fff" dy="-8">N</text></svg></div>
+<div id="carregando"><div><b>Ponte São Luís – Alcântara</b>Montando a maquete 3D…</div></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+// ============ Sistema de coordenadas ============
+// Dados em unidades de 10 m (x = leste, z = -norte). A cena gira o mapa para que a ponte fique no eixo X:
+// +X = São Luís, -X = Alcântara, origem no meio da ponte.
+const C = window.COSTA, D = window.CENA;
+const PA = D.pousoSL, PB = D.pousoAL;
+const HALF = Math.hypot(PA[0]-PB[0], PA[1]-PB[1]) / 2;     // ≈ 637 → 12,7 km
+const MID = [(PA[0]+PB[0])/2, (PA[1]+PB[1])/2];
+const ANG = Math.atan2(PA[1]-PB[1], PA[0]-PB[0]);
+function T([x, z]) {
+  const dx = x - MID[0], dz = z - MID[1], c = Math.cos(-ANG), s = Math.sin(-ANG);
+  return [dx*c - dz*s, dx*s + dz*c];
+}
+function LL(lat, lon) {
+  const KX = 111320 * Math.cos(-2.45 * Math.PI/180), KY = 110574;
+  return T([(lon + 44.35) * KX / 10, -(lat + 2.45) * KY / 10]);
+}
+const GROUND = 0.7;            // topo do terreno (7 m)
+const SHORE_H = 2.1;           // tabuleiro na linha da costa (21 m)
+const TOP_H = 8.0;             // tabuleiro no vão central (80 m)
+const MAIN = 35;               // meio vão estaiado (350 m)
+
+// ============ Renderização ============
+const app = document.getElementById('app');
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+app.appendChild(renderer.domElement);
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(innerWidth, innerHeight);
+Object.assign(labelRenderer.domElement.style, { position:'fixed', inset:'0', pointerEvents:'none' });
+app.appendChild(labelRenderer.domElement);
+
+const scene = new THREE.Scene();
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const SUN_DIR = V3(800, 900, 400).normalize();
+const DAY = { top:0x3f7fc4, horizon:0xd4e4ee, below:0x9fb9c8, sun:0xfff1d6, fog:0xc8dbe7, sunDir:SUN_DIR };
+const NIGHT = { top:0x02060f, horizon:0x16233a, below:0x0c1626, sun:0x9fb4ff, fog:0x111c2e, sunDir:V3(-0.4, 0.55, -0.7).normalize() };
+scene.fog = new THREE.Fog(DAY.fog, 1400, 7800);
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.3, 14000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.maxPolarAngle = Math.PI * 0.49;
+const hemi = new THREE.HemisphereLight(0xdff0ff, 0x4a5a3a, 0.55); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff1d6, 2.6); sun.position.copy(SUN_DIR).multiplyScalar(1500); scene.add(sun, sun.target);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.6;
+Object.assign(sun.shadow.camera, { near:10, far:4000 });
+
+// Céu em degradê com sol; também gera o reflexo (environment) da água e dos metais
+const skyMat = new THREE.ShaderMaterial({
+  side:THREE.BackSide, depthWrite:false, fog:false,
+  uniforms:{ top:{ value:new THREE.Color(DAY.top) }, horizon:{ value:new THREE.Color(DAY.horizon) }, below:{ value:new THREE.Color(DAY.below) },
+             sunDir:{ value:SUN_DIR.clone() }, sunCol:{ value:new THREE.Color(DAY.sun) } },
+  vertexShader:`varying vec3 vDir; void main(){ vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader:`uniform vec3 top, horizon, below, sunDir, sunCol; varying vec3 vDir;
+    void main(){ vec3 d = normalize(vDir); float h = d.y;
+      vec3 c = h > 0.0 ? mix(horizon, top, pow(h, 0.55)) : mix(horizon, below, pow(-h, 0.4));
+      float s = max(dot(d, sunDir), 0.0);
+      c += sunCol * (pow(s, 900.0) * 6.0 + pow(s, 14.0) * 0.22);
+      gl_FragColor = vec4(c, 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }`
+});
+const sky = new THREE.Mesh(new THREE.SphereGeometry(9000, 48, 24), skyMat); sky.renderOrder = -1; scene.add(sky);
+const pmrem = new THREE.PMREMGenerator(renderer);
+function updateEnv(){
+  const s = new THREE.Scene(); s.add(new THREE.Mesh(new THREE.SphereGeometry(100, 48, 24), skyMat));
+  if (scene.environment) scene.environment.dispose();
+  scene.environment = pmrem.fromScene(s, 0.02).texture;
+}
+updateEnv();
+
+const labels = [];
+function addLabel(text, pos, cls='', group=scene, maxDist=Infinity){
+  const el = document.createElement('div'); el.className = 'label ' + cls; el.textContent = text;
+  const o = new CSS2DObject(el); o.position.copy(pos); group.add(o);
+  if (maxDist < Infinity) labels.push([o, maxDist]);
+  return o;
+}
+function rand(seed){ let s = seed; return () => (s = (s*16807) % 2147483647) / 2147483647; }
+const castAll = (o, rcv=false) => { o.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = rcv; } }); return o; };
+
+// ============ Água ============
+// mapa de normais gerado (soma de ondas periódicas, repete sem emenda) e deslocado no tempo
+function waterNormals(N = 512){
+  const cv = document.createElement('canvas'); cv.width = cv.height = N;
+  const cx = cv.getContext('2d'), img = cx.createImageData(N, N), r = rand(7), k = 2*Math.PI/N;
+  // ondas com vetores inteiros (textura sem emenda) em direções variadas; amplitude cai com a frequência
+  const W = [];
+  while (W.length < 34){ const a = Math.round((r() - 0.5)*44), b = Math.round((r() - 0.3)*44), f = Math.hypot(a, b);
+    if (f >= 3) W.push({ a, b, amp: 6 / Math.pow(f, 1.25), ph: r()*6.28 }); }
+  for (let y=0;y<N;y++) for (let x=0;x<N;x++){
+    let dx = 0, dy = 0;
+    for (const w of W){ const d = w.amp * Math.cos(k*(w.a*x + w.b*y) + w.ph); dx += d*w.a; dy += d*w.b; }
+    const nx = -dx*0.05, ny = -dy*0.05, l = Math.hypot(nx, ny, 1), i = (y*N + x)*4;
+    img.data[i] = (nx/l*0.5+0.5)*255; img.data[i+1] = (ny/l*0.5+0.5)*255; img.data[i+2] = (1/l*0.5+0.5)*255; img.data[i+3] = 255;
+  }
+  cx.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(380, 380); t.anisotropy = 8;
+  return t;
+}
+const waterNormal = waterNormals();
+const waterMat = new THREE.MeshStandardMaterial({ color:0x1d5563, roughness:0.2, metalness:0.05, normalMap:waterNormal, normalScale:new THREE.Vector2(0.22, 0.22), envMapIntensity:0.9 });
+const water = new THREE.Mesh(new THREE.PlaneGeometry(24000, 24000).rotateX(-Math.PI/2), waterMat);
+water.position.y = -0.2; water.receiveShadow = true; scene.add(water);
+
+// ============ Terreno (litoral real pintado em canvas) ============
+const GSIZE = 5200, GPX = 4096;
+const gcv = document.createElement('canvas'); gcv.width = gcv.height = GPX;
+const gctx = gcv.getContext('2d');
+const toPx = ([x, z]) => [(x + GSIZE/2) / GSIZE * GPX, (z + GSIZE/2) / GSIZE * GPX];
+function paintLand(ring){
+  const pts = ring.map(T);
+  gctx.beginPath();
+  pts.forEach((p, i) => { const [u, v] = toPx(p); i ? gctx.lineTo(u, v) : gctx.moveTo(u, v); });
+  gctx.closePath(); gctx.fillStyle = '#6f8f4e'; gctx.fill();
+  return pts;
+}
+function tracePath(pts, close){ gctx.beginPath(); pts.forEach((p, i) => { const [u, v] = toPx(p); i ? gctx.lineTo(u, v) : gctx.moveTo(u, v); }); if (close) gctx.closePath(); }
+const ringSL = paintLand(C.saoLuis), ringAL = paintLand(C.alcantara);
+C.ilhas.forEach(paintLand);
+{ const r = rand(42); gctx.globalCompositeOperation = 'source-atop';
+  for (let i=0;i<60000;i++){ gctx.fillStyle = ['rgba(52,88,40,.09)','rgba(128,146,84,.08)','rgba(88,112,58,.09)','rgba(150,140,95,.06)'][i%4];
+    gctx.beginPath(); gctx.ellipse(r()*GPX, r()*GPX, 1 + r()*7, 1 + r()*5, r()*3.14, 0, Math.PI*2); gctx.fill(); }
+  // litoral: faixa de mangue escuro e areia na beira
+  for (const ring of [ringSL, ringAL, ...C.ilhas.map(r => r.map(T))]){
+    tracePath(ring, true); gctx.strokeStyle = 'rgba(38,70,44,.85)'; gctx.lineWidth = 11; gctx.stroke();
+    gctx.strokeStyle = '#d6c697'; gctx.lineWidth = 3; gctx.stroke();
+  }
+  // Centro de Lançamento de Alcântara: área de restinga mais clara dentro do perímetro e clareiras dos setores
+  const K = window.CLA;
+  tracePath(K.limite.map(T), true); gctx.fillStyle = 'rgba(170,175,110,.22)'; gctx.fill();
+  gctx.strokeStyle = 'rgba(235,235,225,.3)'; gctx.lineWidth = 1; gctx.stroke();
+  for (const [k, rad] of [['TMI', 24], ['Rancho', 30], ['aerodromo', 40]]){
+    const [u, v] = toPx(T(K.pontos[k])), g = gctx.createRadialGradient(u, v, 0, u, v, rad);
+    g.addColorStop(0, 'rgba(196,186,140,.6)'); g.addColorStop(0.6, 'rgba(180,176,128,.35)'); g.addColorStop(1, 'rgba(180,176,128,0)');
+    gctx.fillStyle = g; gctx.beginPath(); gctx.arc(u, v, rad, 0, Math.PI*2); gctx.fill();
+  }
+  gctx.globalCompositeOperation = 'source-over'; }
+const groundTex = new THREE.CanvasTexture(gcv);
+groundTex.colorSpace = THREE.SRGBColorSpace; groundTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(GSIZE, GSIZE), new THREE.MeshStandardMaterial({ map:groundTex, alphaTest:0.5, roughness:0.95 }));
+ground.rotation.x = -Math.PI/2; ground.position.y = GROUND; ground.receiveShadow = true; scene.add(ground);
+
+function inside(pt, ring){
+  let ins = false;
+  for (let i=0, j=ring.length-1; i<ring.length; j=i++){
+    const [xi, zi] = ring[i], [xj, zj] = ring[j];
+    if (((zi > pt[1]) !== (zj > pt[1])) && (pt[0] < (xj-xi)*(pt[1]-zi)/(zj-zi) + xi)) ins = !ins;
+  }
+  return ins;
+}
+
+// ============ Ruas e trilhos reais (faixas planas sobre o terreno) ============
+function ribbons(lines, widthOf, yOf){
+  const pos = [], idx = [];
+  for (const ln of lines){
+    const pts = ln.pts, w = widthOf(ln) / 2, y = yOf(ln);
+    for (let i=0;i<pts.length-1;i++){
+      const [ax, az] = pts[i], [bx, bz] = pts[i+1];
+      const dx = bx-ax, dz = bz-az, L = Math.hypot(dx, dz) || 1, nx = -dz/L*w, nz = dx/L*w;
+      const b = pos.length/3;
+      pos.push(ax+nx, y, az+nz, ax-nx, y, az-nz, bx+nx, y, bz+nz, bx-nx, y, bz-nz);
+      idx.push(b, b+2, b+1, b+1, b+2, b+3);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+  return g;
+}
+const ROAD_W = [2.0, 1.5, 1.1, 0.9, 0.55];
+const roadLines = D.ruas.map(([c, pts, name]) => ({ c, name, pts: pts.map(T) }));
+const roadMat = new THREE.MeshStandardMaterial({ color:0x5b5f66, roughness:0.95, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2 });
+scene.add(new THREE.Mesh(ribbons(roadLines, l => ROAD_W[l.c], l => GROUND + 0.02 + (4-l.c)*0.004), roadMat));
+const railMat = new THREE.MeshStandardMaterial({ color:0x8a5236, roughness:0.9, polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3 });
+scene.add(new THREE.Mesh(ribbons(D.trilhos.map(p => ({ pts:p.map(T) })), () => 0.6, () => GROUND + 0.05), railMat));
+
+// ============ Prédios reais (OSM) ============
+{
+  const geos = [[], []];   // [altura estimada, altura real]
+  for (const [ring, h, real] of D.predios){
+    const pts = ring.map(T);
+    const shape = new THREE.Shape(pts.map(p => new THREE.Vector2(p[0], -p[1])));
+    const g = new THREE.ExtrudeGeometry(shape, { depth:Math.max(h, 0.3), bevelEnabled:false });
+    g.rotateX(-Math.PI/2); g.translate(0, GROUND, 0);
+    geos[real].push(g);
+  }
+  [[0xe8e2d6, 0], [0xf4efe6, 1]].forEach(([col, k]) => {
+    if (geos[k].length) scene.add(castAll(new THREE.Mesh(mergeGeometries(geos[k]), new THREE.MeshStandardMaterial({ color:col, roughness:0.8 })), true));
+  });
+}
+// Casario genérico onde o OSM não tem prédios (Centro de São Luís e Alcântara)
+const box = new THREE.BoxGeometry(1,1,1); box.translate(0,0.5,0);
+function filler(n, seed, center, radius, ring, gen){
+  const r = rand(seed), list = []; let tries = 0;
+  while (list.length < n && tries++ < n*40){
+    const a = r()*Math.PI*2, d = Math.sqrt(r())*radius, p = [center[0] + Math.cos(a)*d, center[1] + Math.sin(a)*d];
+    if (inside(p, ring)) list.push({ p, ...gen(r) });
+  }
+  const mesh = new THREE.InstancedMesh(box, new THREE.MeshStandardMaterial({ roughness:0.8 }), list.length);
+  const m = new THREE.Matrix4(), c = new THREE.Color();
+  list.forEach((b, i) => { m.compose(V3(b.p[0], GROUND, b.p[1]), new THREE.Quaternion().setFromAxisAngle(V3(0,1,0), b.rot || 0), V3(b.w, b.h, b.d)); mesh.setMatrixAt(i, m); mesh.setColorAt(i, c.set(b.col)); });
+  mesh.castShadow = mesh.receiveShadow = true; scene.add(mesh);
+}
+const P = {
+  centroSL: T(D.centroSL), alcantara: T(D.alcantaraCentro), holandeses: T(D.holandeses), anel: T(D.anel),
+  farol: LL(-2.4885, -44.3040),
+};
+filler(600, 6, P.centroSL, 260, ringSL, r => ({ w:2+r()*3.5, d:2+r()*3.5, h:0.7+r()*1.8, col:['#e9dcc0','#d9a77f','#f1ece2','#c98a6a','#b7cfdc'][Math.floor(r()*5)] }));
+filler(320, 7, P.alcantara, 120, ringAL, r => ({ w:2+r()*3, d:2+r()*3, h:0.6+r()*0.7, col:['#f1e3c6','#e6b98b','#f4f0e6','#d98f6a','#a9c7d8'][Math.floor(r()*5)] }));
+
+// Marcos: igreja de São Matias, farol de São Marcos
+{
+  const mat = new THREE.MeshStandardMaterial({ color:0xcab89a, roughness:1 }), g = new THREE.Group();
+  const front = new THREE.Mesh(new THREE.BoxGeometry(3, 4, 7), mat); front.position.y = 2; g.add(front);
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(14, 2.5, 0.6), mat); wall.position.set(-8,1.25,3.2); g.add(wall);
+  const wall2 = wall.clone(); wall2.position.z = -3.2; g.add(wall2);
+  g.position.set(P.alcantara[0], GROUND, P.alcantara[1]); scene.add(g);
+}
+const farolTop = new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.1,1.2,12), new THREE.MeshStandardMaterial({ color:0xd23b2b }));
+{
+  const g = new THREE.Group();
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(0.9,1.4,7,12), new THREE.MeshStandardMaterial({ color:0xffffff })); t.position.y = 3.5; g.add(t);
+  farolTop.position.y = 7.6; g.add(farolTop);
+  const fp = inside(P.farol, ringSL) ? P.farol : [HALF + 20, -25];
+  g.position.set(fp[0], GROUND, fp[1]); scene.add(g);
+}
+
+// ============ Caminhos 3D ============
+class Path3 {
+  constructor(pts){ this.p = pts; this.s = [0];
+    for (let i=1;i<pts.length;i++) this.s.push(this.s[i-1] + pts[i].distanceTo(pts[i-1]));
+    this.len = this.s[this.s.length-1]; }
+  at(s){
+    s = Math.max(0, Math.min(this.len, s));
+    let lo = 0, hi = this.s.length-1;
+    while (hi - lo > 1){ const mid = (lo+hi)>>1; (this.s[mid] <= s) ? lo = mid : hi = mid; }
+    const t = (s - this.s[lo]) / ((this.s[hi]-this.s[lo]) || 1);
+    const pos = this.p[lo].clone().lerp(this.p[hi], t);
+    const dir = this.p[hi].clone().sub(this.p[lo]).normalize();
+    return { pos, dir };
+  }
+}
+// curva suave (Catmull-Rom) por pontos 2D, com altura por função do comprimento acumulado
+function makePath(pts2, heightAt, step=4){
+  const curve = new THREE.CatmullRomCurve3(pts2.map(([x,z]) => V3(x, 0, z)), false, 'centripetal');
+  const n = Math.max(2, Math.ceil(curve.getLength() / step));
+  const raw = curve.getSpacedPoints(n);
+  let acc = 0; const L = curve.getLength();
+  return new Path3(raw.map((p, i) => { if (i) acc += p.distanceTo(raw[i-1]); return V3(p.x, heightAt(acc, L, p), p.z); }));
+}
+function offsetPath(path, off){
+  return new Path3(path.p.map((p, i) => {
+    const a = path.p[Math.max(0,i-1)], b = path.p[Math.min(path.p.length-1,i+1)];
+    const d = b.clone().sub(a); d.y = 0; d.normalize();
+    return V3(p.x - d.z*off, p.y, p.z + d.x*off);
+  }));
+}
+const smooth = t => { t = Math.min(Math.max(t,0),1); return t*t*(3-2*t); };
+
+// Perfil da ponte principal: arco suave de 21 m na costa até 80 m no centro (rampa máx. ≈ 1,5%)
+const deckH = x => SHORE_H + (TOP_H - SHORE_H) * Math.cos(Math.min(Math.abs(x)/HALF, 1) * Math.PI/2) ** 2;
+
+// Rota rodoviária completa: Anel do Contorno (Alcântara) → ponte → Av. dos Holandeses (São Luís)
+const roadPath = (() => {
+  const pts = [];
+  // acesso em Alcântara: do Anel do Contorno até 300 m antes da costa (em nível), depois rampa
+  const a0 = P.anel, a1 = [-HALF - 30, 0];
+  for (let i=0;i<=20;i++){ const t=i/20; pts.push(V3(a0[0]+(a1[0]-a0[0])*t, GROUND+0.06, a0[1]+(a1[1]-a0[1])*t)); }
+  for (let x=-HALF-30+3; x<-HALF; x+=3) pts.push(V3(x, GROUND+0.06 + (SHORE_H-GROUND-0.06)*smooth((x+HALF+30)/30), 0));
+  for (let x=-HALF; x<=HALF; x+=5) pts.push(V3(x, deckH(x), 0));
+  // rampa em curva até a rotatória da Av. dos Holandeses
+  const h = P.holandeses, c1 = V3(HALF+14, SHORE_H, 0), c2 = V3(h[0], GROUND+0.06, h[1]);
+  const mid = V3(HALF + 22, 0, 0).lerp(V3(h[0], 0, h[1]), 0.35);
+  const bz = new THREE.QuadraticBezierCurve3(V3(HALF,SHORE_H,0), V3(mid.x, (SHORE_H+GROUND)/2+0.4, mid.z*0.3), c2);
+  bz.getSpacedPoints(12).slice(1).forEach(p => pts.push(p));
+  return new Path3(pts);
+})();
+
+// ============ Construtor de tabuleiros e pilares ============
+const concrete = new THREE.MeshStandardMaterial({ color:0xc9c6bf, roughness:0.75 });
+const asphalt = new THREE.MeshStandardMaterial({ color:0x3a3d42, roughness:0.9 });
+const ballast = new THREE.MeshStandardMaterial({ color:0x6d5a4a, roughness:1 });
+const steelRail = new THREE.MeshStandardMaterial({ color:0xc86b3c, roughness:0.5, metalness:0.4 });
+const unitBox = new THREE.BoxGeometry(1,1,1);
+const colGeo = new THREE.CylinderGeometry(0.35, 0.45, 1, 10); colGeo.translate(0,0.5,0);
+const X1 = V3(1,0,0);
+function buildDeck(path, { width, top=asphalt, rails=false, skipPier=()=>false, minH=GROUND+0.5, group=scene, spacing=5, edgeMat=concrete }){
+  const n = Math.ceil(path.len / spacing);
+  const deck = new THREE.InstancedMesh(unitBox, concrete, n), surf = new THREE.InstancedMesh(unitBox, top, n);
+  const edge = new THREE.InstancedMesh(unitBox, edgeMat, n*2);
+  const railI = rails ? new THREE.InstancedMesh(unitBox, steelRail, n*4) : null;
+  const cols = [], M = new THREE.Matrix4(), Q = new THREE.Quaternion();
+  for (let i=0;i<n;i++){
+    const a = path.at(i*spacing), b = path.at(Math.min((i+1)*spacing, path.len));
+    const d = b.pos.clone().sub(a.pos), L = d.length(); if (L < 0.01) continue;
+    Q.setFromUnitVectors(X1, d.clone().normalize());
+    const c = a.pos.clone().add(b.pos).multiplyScalar(0.5);
+    M.compose(c.clone().add(V3(0,-0.3,0)), Q, V3(L+0.05, 0.6, width)); deck.setMatrixAt(i, M);
+    M.compose(c.clone().add(V3(0,0.02,0)), Q, V3(L+0.05, 0.05, width-0.3)); surf.setMatrixAt(i, M);
+    const side = V3(-d.z, 0, d.x).normalize();
+    for (const k of [0,1]){ M.compose(c.clone().addScaledVector(side, (k?1:-1)*(width/2-0.05)).add(V3(0,0.12,0)), Q, V3(L+0.05, 0.22, 0.1)); edge.setMatrixAt(i*2+k, M); }
+    if (rails) [-0.55,-0.35,0.35,0.55].forEach((o, k) => { M.compose(c.clone().addScaledVector(side, o).add(V3(0,0.08,0)), Q, V3(L+0.05, 0.06, 0.05)); railI.setMatrixAt(i*4+k, M); });
+    if (a.pos.y > minH && !skipPier(a.pos)) cols.push([a.pos, side]);
+  }
+  const colI = new THREE.InstancedMesh(colGeo, concrete, cols.length*2);
+  cols.forEach(([p, side], i) => {
+    const top = p.y - 0.6, thick = 1 + (top > 5 ? 0.5 : 0);
+    for (const k of [0,1]){
+      const q = p.clone().addScaledVector(side, (k?1:-1)*Math.max(width/2-0.8, 0.5));
+      M.compose(V3(q.x, -3, q.z), Q.identity(), V3(thick, top+3, thick)); colI.setMatrixAt(i*2+k, M);
+    }
+  });
+  deck.castShadow = colI.castShadow = edge.castShadow = true; surf.receiveShadow = deck.receiveShadow = true;
+  [deck, surf, edge, colI, railI].forEach(o => o && group.add(o));
+  return group;
+}
+
+// Ponte principal (4 faixas)
+const edgeLit = new THREE.MeshStandardMaterial({ color:0xd8d5ce, roughness:0.6, emissive:0x000000 });
+buildDeck(roadPath, { width:3.2, edgeMat:edgeLit, skipPier: p => Math.abs(p.x) < MAIN + 2 && Math.abs(p.z) < 3 });
+
+// Sinalização: faixas tracejadas entre as pistas e barreira central (New Jersey)
+{
+  const dash = [], bar = [];
+  for (let s = 0; s < roadPath.len; s += 3) for (const o of [-0.72, 0.72]) dash.push([s, o]);
+  for (let s = 0; s < roadPath.len; s += 2) bar.push(s);
+  const mk = (geo, mat, n) => new THREE.InstancedMesh(geo, mat, n);
+  const dI = mk(new THREE.BoxGeometry(1.2, 0.01, 0.06), new THREE.MeshStandardMaterial({ color:0xf2f2ee, roughness:0.6 }), dash.length);
+  const bI = mk(new THREE.BoxGeometry(2.02, 0.11, 0.1).translate(0, 0.055, 0), concrete, bar.length);
+  const M = new THREE.Matrix4(), Qd = new THREE.Quaternion();
+  const put = (I, i, s, off, y) => { const { pos, dir } = roadPath.at(s); const sd = V3(-dir.z, 0, dir.x).normalize();
+    Qd.setFromUnitVectors(X1, dir); M.compose(pos.addScaledVector(sd, off).add(V3(0, y, 0)), Qd, V3(1, 1, 1)); I.setMatrixAt(i, M); };
+  dash.forEach(([s, o], i) => put(dI, i, s, o, 0.05));
+  bar.forEach((s, i) => put(bI, i, s, 0, 0.045));
+  bI.castShadow = true; scene.add(dI, bI);
+}
+
+// ============ Corredor ferroviário (trem de passageiros São Luís ↔ Alcântara) ============
+const trainGroup = new THREE.Group(); scene.add(trainGroup);
+const SIDE = 1;                       // lado da ponte onde ficam os trilhos
+const RAIL_Z = SIDE * 2.6;
+// faixa ferroviária ao lado da pista: estação elevada em São Luís → ponte → pátio/estação em Alcântara
+const railMainPts = [];
+for (let x = HALF + 12; x >= -HALF; x -= 5) railMainPts.push(V3(x, deckH(Math.min(x, HALF)), RAIL_Z));
+for (let x = -HALF - 5; x >= -HALF - 90; x -= 5) railMainPts.push(V3(x, GROUND + 0.06 + (SHORE_H - GROUND) * smooth((x + HALF + 90) / 90), RAIL_Z));
+const railMain = new Path3(railMainPts);
+buildDeck(railMain, { width:1.8, rails:true, top:ballast, group:trainGroup, skipPier: p => Math.abs(p.x) < MAIN + 2 });
+// estação elevada de São Luís, na cabeceira (integração com ônibus na Av. dos Holandeses)
+{
+  const plat = new THREE.Mesh(new THREE.BoxGeometry(16, 0.2, 1.2), concrete);
+  plat.position.set(HALF + 2, SHORE_H + 0.15, RAIL_Z + SIDE*1.4); trainGroup.add(plat);
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(16, 0.12, 2.6), new THREE.MeshStandardMaterial({ color:0x9fb3c2 }));
+  roof.position.set(HALF + 2, SHORE_H + 1.3, RAIL_Z + SIDE*0.6); trainGroup.add(roof);
+  addLabel('Estação São Luís (elevada)', V3(HALF + 2, 7, RAIL_Z + SIDE*2), 'rail', trainGroup, 900);
+}
+// estação e pátio de Alcântara
+{
+  const yard = new THREE.Mesh(new THREE.BoxGeometry(70, 0.1, 9), ballast);
+  yard.position.set(-HALF - 125, GROUND + 0.05, RAIL_Z + SIDE*3); trainGroup.add(yard);
+  const shed = new THREE.Mesh(new THREE.BoxGeometry(30, 1.6, 5), new THREE.MeshStandardMaterial({ color:0x9fb3c2 }));
+  shed.position.set(-HALF - 120, GROUND + 0.8, RAIL_Z + SIDE*9); trainGroup.add(shed);
+  addLabel('Estação e pátio de Alcântara', V3(-HALF - 120, 8, RAIL_Z + SIDE*6), 'rail', trainGroup, 900);
+}
+// trem de passageiros: vai e volta entre as duas estações
+const trainPath = railMain;
+const WAGONS = 8;
+const trainMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1.5, 0.42, 0.34).translate(0, 0.32, 0), new THREE.MeshStandardMaterial({ roughness:0.5, metalness:0.3 }), WAGONS);
+{ const c = new THREE.Color(); for (let i=0;i<WAGONS;i++) trainMesh.setColorAt(i, c.set(i===0 || i===WAGONS-1 ? '#f2c94c' : '#e7ecef')); }
+trainMesh.frustumCulled = false;   // a malha se move; evita sumir pelo recorte de câmera
+trainGroup.add(trainMesh);
+let trainS = 0, trainHead = 0, trainDir = 1;
+
+// ============ Torres estaiadas + estais ============
+const towerMat = new THREE.MeshStandardMaterial({ color:0xe9e6df, roughness:0.55, emissive:0x000000 });
+const TOP = 24, cablePts = [];
+for (const tx of [-MAIN, MAIN]) {
+  const g = new THREE.Group(), base = -3, spread = 7.5;
+  const legLen = Math.hypot(TOP - base, spread);
+  for (const s of [1,-1]) {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(1.1, legLen, 1.1), towerMat);
+    leg.position.set(0, (TOP + base)/2, s*spread/2); leg.rotation.x = -s*Math.atan2(spread, TOP - base); g.add(leg);
+  }
+  const cross = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 9), towerMat); cross.position.y = deckH(tx) - 0.9; g.add(cross);
+  const head = new THREE.Mesh(new THREE.BoxGeometry(1.4, 4, 1.4), towerMat); head.position.y = TOP + 1.5; g.add(head);
+  const footing = new THREE.Mesh(new THREE.CylinderGeometry(5, 5.5, 4, 20), concrete); footing.position.y = -1.5; g.add(footing);
+  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 8), new THREE.MeshBasicMaterial({ color:0xff2a2a })); beacon.position.y = TOP + 3.8; g.add(beacon);
+  g.position.x = tx; castAll(g); scene.add(g);
+  for (let k=1;k<=12;k++){
+    const ay = TOP - 0.4 - k*0.42;
+    for (const dir of [1,-1]) {
+      const dx = tx + dir*(k*2.75 + 0.8), dy = deckH(dx) + 0.35;
+      // dois planos de estais: borda da pista e borda externa da faixa ferroviária
+      for (const zz of [-SIDE*1.6, RAIL_Z + SIDE*0.9]) cablePts.push(tx, ay, zz*0.12, dx, dy, zz);
+    }
+  }
+}
+const cableGeo = new THREE.BufferGeometry(); cableGeo.setAttribute('position', new THREE.Float32BufferAttribute(cablePts, 3));
+const cables = new THREE.LineSegments(cableGeo, new THREE.LineBasicMaterial({ color:0xf4f4f4 })); scene.add(cables);
+
+// Postes
+const lampPos = []; for (let x=-HALF; x<=HALF; x+=6) for (const zz of [-1.5, 1.5]) lampPos.push([x, zz]);
+const lampMat = new THREE.MeshBasicMaterial({ color:0x555555 });
+const lampI = new THREE.InstancedMesh(new THREE.BoxGeometry(0.42, 0.06, 0.16), lampMat, lampPos.length);
+const poleI = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.03, 0.045, 1.3, 5).translate(0, 0.65, 0), new THREE.MeshStandardMaterial({ color:0x8c9096, metalness:0.6, roughness:0.4 }), lampPos.length);
+{ const M = new THREE.Matrix4(); lampPos.forEach(([x,z],i) => {
+    M.makeTranslation(x, deckH(x)+1.3, z*0.92); lampI.setMatrixAt(i, M);
+    M.makeTranslation(x, deckH(x), z*1.04); poleI.setMatrixAt(i, M); }); }
+scene.add(lampI, poleI);
+
+// ============ Centro de Lançamento de Alcântara (CLA) — posições reais do OpenStreetMap ============
+const K = window.CLA;
+const claGroup = new THREE.Group(); scene.add(claGroup);
+const PAD = T(K.pontos.TMI), CASA = T(K.pontos.Casamata), LANC = T(K.pontos['Lançador Universal']);
+const AERO = T(K.pontos.aerodromo), APOIO = T(K.pontos.Rancho), TELE = T(K.pontos.Telemedidas);
+const claRing = K.limite.map(T);
+const metal = new THREE.MeshStandardMaterial({ color:0xdfe3e6, roughness:0.45, metalness:0.55 });
+const metalDark = new THREE.MeshStandardMaterial({ color:0x5b6b7a, roughness:0.5, metalness:0.5 });
+const white = new THREE.MeshStandardMaterial({ color:0xf5f5f2, roughness:0.4 });
+const black = new THREE.MeshStandardMaterial({ color:0x1d1f22, roughness:0.5 });
+const grass = new THREE.MeshStandardMaterial({ color:0x6f8a4a, roughness:1 });
+const red = new THREE.MeshStandardMaterial({ color:0xd23b2b, roughness:0.6 });
+const mesh = (geo, mat, x, y, z, parent=claGroup) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; parent.add(m); return m; };
+
+// perímetro (cerca) e estradas internas
+claGroup.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(claRing.map(([x, z]) => V3(x, GROUND + 0.1, z))),
+  new THREE.LineBasicMaterial({ color:0xf2f2f2, transparent:true, opacity:0.75 })));
+const claRoads = K.ruas.map(([c, pts]) => ({ c, pts: pts.map(T) })).filter(l => l.pts.some(p => inside(p, claRing)));
+claGroup.add(new THREE.Mesh(ribbons(claRoads, l => ROAD_W[l.c] * 0.8, () => GROUND + 0.024), roadMat));
+
+// pista 09/27 (2,6 km × 45 m), taxiways, pátio e helipontos
+const rwMat = new THREE.MeshStandardMaterial({ color:0x2e3135, roughness:0.85, polygonOffset:true, polygonOffsetFactor:-4, polygonOffsetUnits:-4 });
+const RW = K.pistas[0].pts.map(T);
+claGroup.add(new THREE.Mesh(ribbons([{ pts:RW }], () => 4.5, () => GROUND + 0.03), rwMat));
+claGroup.add(new THREE.Mesh(ribbons(K.taxi.map(p => ({ pts:p.map(T) })), () => 2.3, () => GROUND + 0.029), rwMat));
+{
+  const padMat = new THREE.MeshStandardMaterial({ color:0x8e9196, roughness:0.9, polygonOffset:true, polygonOffsetFactor:-5, polygonOffsetUnits:-5 });
+  for (const ring of K.patios){
+    const g = new THREE.ShapeGeometry(new THREE.Shape(ring.map(T).map(p => new THREE.Vector2(p[0], -p[1]))));
+    g.rotateX(-Math.PI/2); const m = new THREE.Mesh(g, padMat); m.position.y = GROUND + 0.032; m.receiveShadow = true; claGroup.add(m);
+  }
+  // marcas da pista: eixo tracejado e faixas de cabeceira
+  const a = V3(RW[0][0], 0, RW[0][1]), b = V3(RW[1][0], 0, RW[1][1]), dir = b.clone().sub(a), L = dir.length(); dir.normalize();
+  const sd = V3(-dir.z, 0, dir.x), marks = [];
+  for (let s = 10; s < L - 10; s += 5) marks.push([s, 0, 3, 0.09]);
+  for (const s0 of [2.2, L - 2.2]) for (let k = -3.5; k <= 3.5; k++) marks.push([s0, k*0.5, 3, 0.25]);
+  for (const s0 of [L*0.12, L*0.88]) for (const o of [-1.1, 1.1]) marks.push([s0, o, 4.5, 0.45]);   // zona de toque
+  const I = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 0.01, 1), new THREE.MeshStandardMaterial({ color:0xf4f4f0, roughness:0.6 }), marks.length);
+  const Mx = new THREE.Matrix4(), Qr = new THREE.Quaternion().setFromUnitVectors(X1, dir);
+  marks.forEach(([s, o, l, w], i) => { Mx.compose(a.clone().addScaledVector(dir, s).addScaledVector(sd, o).setY(GROUND + 0.04), Qr, V3(l, 1, w)); I.setMatrixAt(i, Mx); });
+  claGroup.add(I);
+}
+
+// prédios técnicos e hangar (contornos do OSM); a Torre Móvel e a casamata são modeladas à parte
+{
+  const geos = [];
+  for (const [ring, h, name] of K.predios){
+    if (name === 'TMI' || name === 'Casamata') continue;
+    const g = new THREE.ExtrudeGeometry(new THREE.Shape(ring.map(T).map(p => new THREE.Vector2(p[0], -p[1]))), { depth:h, bevelEnabled:false });
+    g.rotateX(-Math.PI/2); g.translate(0, GROUND, 0); geos.push(g);
+  }
+  claGroup.add(castAll(new THREE.Mesh(mergeGeometries(geos), new THREE.MeshStandardMaterial({ color:0xeeece6, roughness:0.75 })), true));
+}
+
+// Plataforma do VLS: base, mesa de lançamento, foguete e Torre Móvel de Integração (~33 m) sobre trilhos
+const padG = new THREE.Group(); padG.position.set(PAD[0], GROUND, PAD[1]);
+padG.rotation.y = Math.atan2(-(CASA[1] - PAD[1]), CASA[0] - PAD[0]) + Math.PI/2;   // trilhos perpendiculares à linha da casamata
+claGroup.add(padG);
+mesh(new THREE.BoxGeometry(15, 0.12, 6.5), new THREE.MeshStandardMaterial({ color:0xb9b6ae, roughness:0.9 }), 3.5, 0.06, 0, padG);
+mesh(new THREE.BoxGeometry(1.3, 0.13, 4.2), black, 0, 0.07, -2.4, padG);                       // fosso de chamas
+mesh(new THREE.BoxGeometry(0.7, 0.34, 0.7), new THREE.MeshStandardMaterial({ color:0x8d939a, metalness:0.4, roughness:0.5 }), 0, 0.29, 0, padG);
+for (const z of [-0.55, 0.55]) mesh(new THREE.BoxGeometry(10, 0.05, 0.07), metalDark, 4.2, 0.145, z, padG);
+// foguete (proporções do VLS: ~19,5 m, núcleo de 1 m e quatro propulsores laterais)
+const rocket = new THREE.Group(); rocket.position.y = 0.46; padG.add(rocket);
+{
+  const cyl = (r, h) => new THREE.CylinderGeometry(r, r, h, 16);
+  mesh(cyl(0.05, 1.62), white, 0, 0.81, 0, rocket);
+  mesh(cyl(0.046, 0.2), white, 0, 1.72, 0, rocket);
+  mesh(new THREE.ConeGeometry(0.046, 0.14, 16), white, 0, 1.89, 0, rocket);
+  for (const y of [0.55, 1.25, 1.6]) mesh(cyl(0.052, 0.035), black, 0, y, 0, rocket);
+  for (let k = 0; k < 4; k++){
+    const a = k*Math.PI/2 + Math.PI/4, x = Math.cos(a)*0.1, z = Math.sin(a)*0.1;
+    mesh(cyl(0.05, 0.86), white, x, 0.43, z, rocket);
+    mesh(new THREE.ConeGeometry(0.05, 0.12, 16), white, x, 0.92, z, rocket);
+    mesh(cyl(0.052, 0.03), black, x, 0.75, z, rocket);
+  }
+}
+const flame = new THREE.Mesh(new THREE.ConeGeometry(0.16, 1, 16, 1, true).rotateX(Math.PI).translate(0, -0.5, 0),
+  new THREE.MeshBasicMaterial({ color:0xffb347, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false }));
+flame.visible = false; rocket.add(flame);
+const flameLight = new THREE.PointLight(0xff9a40, 0, 60, 1.5); flameLight.position.y = -0.2; rocket.add(flameLight);
+const tmi = new THREE.Group(); padG.add(tmi);
+{
+  const H = 3.3, W = 1.25;
+  mesh(new THREE.BoxGeometry(W + 0.3, 0.16, W + 0.3), metalDark, 0, 0.21, 0, tmi);
+  mesh(new THREE.BoxGeometry(0.08, H, W), metal, W/2, 0.3 + H/2, 0, tmi);                     // parede do fundo
+  for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(W, H, 0.08), metal, 0, 0.3 + H/2, s*W/2, tmi);
+  for (let y = 0.7; y < H; y += 0.42) for (const s of [-1, 1]) mesh(new THREE.BoxGeometry(W + 0.02, 0.05, 0.1), metalDark, 0, 0.3 + y, s*W/2, tmi);
+  mesh(new THREE.BoxGeometry(W + 0.1, 0.14, W + 0.1), metalDark, 0, 0.3 + H + 0.07, 0, tmi);
+  mesh(new THREE.BoxGeometry(1.9, 0.12, 0.14), metalDark, -0.3, 0.3 + H + 0.25, 0, tmi);       // ponte rolante
+}
+const TMI_OPEN = 6.5;
+tmi.position.x = TMI_OPEN;   // recuada: foguete à vista
+// para-raios e torres de comunicação (pontos do OSM)
+for (const [x0, z0, kind] of K.torres){
+  const [x, z] = T([x0, z0]);
+  if (kind === 'raio'){ mesh(new THREE.CylinderGeometry(0.025, 0.05, 4.4, 6).translate(0, 2.2, 0), metalDark, x, GROUND, z); }
+  else for (let k = 0; k < 6; k++) mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.85, 6), k % 2 ? white : red, x, GROUND + 0.43 + k*0.85, z);
+}
+// casamata (bunker de controle, coberto de terra)
+{
+  mesh(new THREE.SphereGeometry(1, 20, 10, 0, Math.PI*2, 0, Math.PI/2).scale(1.6, 0.55, 1.1), grass, CASA[0], GROUND, CASA[1]);
+  const front = mesh(new THREE.BoxGeometry(1.5, 0.42, 0.9), new THREE.MeshStandardMaterial({ color:0xa9a69e, roughness:0.9 }), CASA[0], GROUND + 0.21, CASA[1]);
+  front.lookAt(PAD[0], GROUND + 0.21, PAD[1]);
+}
+// Lançador Universal (foguetes de sondagem)
+{
+  const g = new THREE.Group(); g.position.set(LANC[0], GROUND, LANC[1]); claGroup.add(g);
+  mesh(new THREE.BoxGeometry(0.5, 0.25, 0.5), metalDark, 0, 0.125, 0, g);
+  const arm = new THREE.Group(); arm.position.y = 0.25; arm.rotation.z = -0.3; g.add(arm);
+  mesh(new THREE.BoxGeometry(0.06, 1.3, 0.08), metal, 0, 0.65, 0, arm);
+  mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.8, 10), white, 0.06, 0.75, 0, arm);
+  mesh(new THREE.ConeGeometry(0.025, 0.08, 10), white, 0.06, 1.19, 0, arm);
+}
+// Telemedidas: radome e antena parabólica de rastreio
+{
+  mesh(new THREE.CylinderGeometry(0.3, 0.35, 0.7, 12), white, TELE[0] + 2, GROUND + 0.35, TELE[1] - 2);
+  mesh(new THREE.SphereGeometry(0.5, 20, 14), white, TELE[0] + 2, GROUND + 1.1, TELE[1] - 2);
+  const dish = mesh(new THREE.SphereGeometry(0.6, 20, 8, 0, Math.PI*2, 0, Math.PI/3.2), new THREE.MeshStandardMaterial({ color:0xf0f0f0, side:THREE.DoubleSide, roughness:0.5 }), TELE[0] - 3, GROUND + 0.9, TELE[1] + 2);
+  dish.rotation.set(-0.9, 0.6, 0);
+  mesh(new THREE.CylinderGeometry(0.06, 0.1, 0.8, 8), metalDark, TELE[0] - 3, GROUND + 0.4, TELE[1] + 2);
+}
+// caixa d'água e farol de Pirarema
+{
+  const [x, z] = T(K.pontos.caixaDagua);
+  for (const [dx, dz] of [[-0.3,-0.3],[0.3,-0.3],[-0.3,0.3],[0.3,0.3]]) mesh(new THREE.CylinderGeometry(0.03, 0.03, 2.2, 5), metalDark, x + dx, GROUND + 1.1, z + dz);
+  mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.8, 16), white, x, GROUND + 2.6, z);
+  const [fx, fz] = T(K.pontos.farolPirarema);
+  for (let k = 0; k < 4; k++) mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.5, 8), k % 2 ? red : white, fx, GROUND + 0.25 + k*0.5, fz);
+}
+// fumaça do lançamento
+const SMOKE = 450;
+const smoke = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), new THREE.MeshStandardMaterial({ color:0xcfcac2, roughness:1, transparent:true, opacity:0.8, depthWrite:false }), SMOKE);
+smoke.frustumCulled = false; smoke.count = 0; claGroup.add(smoke);
+const puffs = [];
+// rótulos da base
+const RWM = [(RW[0][0] + RW[1][0])/2, (RW[0][1] + RW[1][1])/2];
+addLabel('Centro de Lançamento de Alcântara (CLA)', V3(PAD[0], 34, PAD[1]), 'cla big');
+addLabel('Torre Móvel de Integração', V3(PAD[0], 5.2, PAD[1]), 'cla', scene, 160);
+addLabel('Casamata', V3(CASA[0], 2.2, CASA[1]), 'cla', scene, 160);
+addLabel('Lançador Universal', V3(LANC[0], 2.5, LANC[1]), 'cla', scene, 160);
+addLabel('Pista 09/27 · 2,6 km', V3(RWM[0], 3, RWM[1]), 'cla', scene, 1600);
+addLabel('Setor de apoio técnico', V3(APOIO[0], 4, APOIO[1]), 'cla', scene, 1300);
+addLabel('Telemedidas e rastreio', V3(TELE[0], 3, TELE[1]), 'cla', scene, 300);
+{ const far = claRing.reduce((b, p) => Math.hypot(p[0]+HALF, p[1]) < Math.hypot(b[0]+HALF, b[1]) ? p : b);
+  addLabel('Perímetro do CLA (OSM)', V3(far[0], 4, far[1]), 'cla', scene, 2600); }
+
+// ============ Vegetação (restinga, mata e mangue) ============
+{
+  const N = 1024, sc = N / GSIZE, cv = document.createElement('canvas'); cv.width = cv.height = N;
+  const x = cv.getContext('2d'); x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = 'round';
+  const px = ([a, b]) => [(a + GSIZE/2)*sc, (b + GSIZE/2)*sc];
+  const line = (pts, w) => { x.beginPath(); pts.forEach((p, i) => { const [u, v] = px(p); i ? x.lineTo(u, v) : x.moveTo(u, v); }); x.lineWidth = Math.max(1, w*sc); x.stroke(); };
+  const disc = (c, r) => { const [u, v] = px(c); x.beginPath(); x.arc(u, v, r*sc, 0, 7); x.fill(); };
+  roadLines.forEach(l => line(l.pts, ROAD_W[l.c] + 3)); claRoads.forEach(l => line(l.pts, 3));
+  line(RW, 16); K.taxi.forEach(p => line(p.map(T), 6));
+  for (const [ring] of D.predios) line(ring.map(T).concat([T(ring[0])]), 4);
+  for (const [ring] of K.predios) line(ring.map(T).concat([T(ring[0])]), 5);
+  for (const [c, r] of [[PAD, 30], [CASA, 8], [APOIO, 38], [AERO, 30], [TELE, 10], [P.centroSL, 300], [P.alcantara, 140], [T(K.pontos.caixaDagua), 4]]) disc(c, r);
+  line(roadPath.p.map(p => [p.x, p.z]), 10); line(railMain.p.map(p => [p.x, p.z]), 8);
+  disc([-HALF - 120, RAIL_Z + 6], 50);
+  const md = x.getImageData(0, 0, N, N).data;
+  const free = p => { const [u, v] = px(p); return u >= 0 && v >= 0 && u < N && v < N && md[((v|0)*N + (u|0))*4] === 0; };
+  const r = rand(2024), list = [];
+  const patch = (a, b) => Math.sin(a*0.011) + Math.sin(b*0.013 + 1.7) + Math.sin((a + b)*0.006 + 0.4) + 0.6*Math.sin((a - b)*0.021);
+  // manchas de mata: centros sorteados, árvores agrupadas em volta e a copa pintada no chão (vista de longe)
+  gctx.globalCompositeOperation = 'source-atop';
+  const scatter = (ring, clusters, box, density) => {
+    let tries = 0, got = 0;
+    while (got < clusters && tries++ < clusters*15){
+      const c = [box[0] + r()*(box[2] - box[0]), box[1] + r()*(box[3] - box[1])];
+      if (patch(c[0], c[1]) + r()*2.2 < density || !inside(c, ring)) continue;
+      got++;
+      const inCla = inside(c, claRing), R = (inCla ? 4 : 6) + r()*(inCla ? 10 : 22), n = Math.round(R*(inCla ? 1.4 : 2.6));
+      const [u, v] = toPx(c), g = gctx.createRadialGradient(u, v, 0, u, v, R*GPX/GSIZE*1.15);
+      g.addColorStop(0, inCla ? 'rgba(90,110,60,.45)' : 'rgba(38,72,34,.55)'); g.addColorStop(1, 'rgba(38,72,34,0)');
+      gctx.fillStyle = g; gctx.beginPath(); gctx.arc(u, v, R*GPX/GSIZE*1.15, 0, 7); gctx.fill();
+      for (let k = 0; k < n; k++){
+        const a = r()*6.28, d = Math.sqrt(r())*R, p = [c[0] + Math.cos(a)*d, c[1] + Math.sin(a)*d];
+        if (!free(p) || !inside(p, ring)) continue;
+        list.push([p[0], p[1], inCla ? 0.6 + r()*0.5 : 0.9 + r()*1.1, inCla]);
+      }
+    }
+  };
+  const bb = ring => ring.reduce((b, [a, c]) => [Math.min(b[0], a), Math.min(b[1], c), Math.max(b[2], a), Math.max(b[3], c)], [1e9, 1e9, -1e9, -1e9]);
+  const bAL = bb(ringAL);
+  scatter(ringAL, 1300, [Math.max(bAL[0], -GSIZE/2), Math.max(bAL[1], -GSIZE/2), Math.min(bAL[2], GSIZE/2), Math.min(bAL[3], GSIZE/2)], 0.2);
+  scatter(ringSL, 160, [HALF - 200, -700, HALF + 700, 700], 1.2);
+  gctx.globalCompositeOperation = 'source-over'; groundTex.needsUpdate = true;
+  const tree = new THREE.IcosahedronGeometry(0.5, 0).translate(0, 0.5, 0);
+  const I = new THREE.InstancedMesh(tree, new THREE.MeshStandardMaterial({ roughness:0.9, flatShading:true }), list.length);
+  const Mt = new THREE.Matrix4(), Qt = new THREE.Quaternion(), c = new THREE.Color();
+  const greens = ['#3f6b35', '#4d7a3a', '#5a8442', '#36602f', '#6b8a46'], restinga = ['#7f8f52', '#8a9658', '#748a4c'];
+  list.forEach(([px_, pz, s, inCla], i) => {
+    Qt.setFromAxisAngle(V3(0, 1, 0), r()*6.28);
+    Mt.compose(V3(px_, GROUND - 0.05, pz), Qt, V3(s*(1.1 + r()*0.6), s*(0.8 + r()*0.6), s*(1.1 + r()*0.6))); I.setMatrixAt(i, Mt);
+    I.setColorAt(i, c.set((inCla ? restinga : greens)[Math.floor(r()*(inCla ? 3 : 5))]));
+  });
+  I.castShadow = true; scene.add(I);
+}
+
+// ============ Rótulos ============
+addLabel('São Luís · Ponta d\'Areia', V3(HALF + 70, 32, -40), 'big');
+addLabel('Alcântara', V3(P.alcantara[0], 26, P.alcantara[1]), 'big');
+addLabel('Av. dos Holandeses (MA‑203)', V3(P.holandeses[0] + 25, 6, P.holandeses[1] + 10), 'road', scene, 1800);
+addLabel('Anel do Contorno · MA‑106', V3(P.anel[0], 6, P.anel[1]), 'road', scene, 1800);
+addLabel('Via nova · 2,8 km', V3((P.anel[0] - HALF - 30)/2, 5, P.anel[1]/2), 'road', scene, 1800);
+addLabel('Vão de navegação · 700 m · 80 m livres', V3(0, TOP + 9, 0));
+addLabel('Baía de São Marcos', V3(-200, 4, -SIDE*260));
+addLabel('Centro histórico de São Luís', V3(P.centroSL[0], 12, P.centroSL[1]));
+
+// ============ Tráfego ============
+const LANES = [-1.05, -0.4, 0.4, 1.05];
+const carGeo = new THREE.BoxGeometry(0.45, 0.16, 0.2).translate(0, 0.08, 0);
+const truckGeo = new THREE.BoxGeometry(1.1, 0.3, 0.25).translate(0, 0.15, 0);
+const carMat = new THREE.MeshStandardMaterial({ roughness:0.4, metalness:0.4 });
+const N_CARS = 150, N_TRUCKS = 30;
+const cars = new THREE.InstancedMesh(carGeo, carMat, N_CARS);
+const trucks = new THREE.InstancedMesh(truckGeo, new THREE.MeshStandardMaterial({ color:0xdedede, roughness:0.6 }), N_TRUCKS);
+const agents = [];
+{ const r = rand(99), c = new THREE.Color();
+  for (let i=0;i<N_CARS;i++){
+    const lane = i % 4;
+    agents.push({ mesh:cars, i, path:roadPath, s:r()*roadPath.len, off:LANES[lane], dir: lane < 2 ? -1 : 1, v: 9 + r()*5 + (lane===1||lane===2 ? 3 : 0) });
+    cars.setColorAt(i, c.set(['#e0e0e0','#202326','#b0262b','#2a5ea8','#c9c9c9','#f2c94c'][Math.floor(r()*6)]));
+  }
+  for (let i=0;i<N_TRUCKS;i++){
+    agents.push({ mesh:trucks, i, path:roadPath, s:r()*roadPath.len, off: i%2 ? -1.05 : 1.05, dir: i%2 ? -1 : 1, v: 7 + r()*2 });
+  }
+}
+cars.frustumCulled = trucks.frustumCulled = false;
+scene.add(cars, trucks);
+
+// ============ Interface ============
+let mode = 'geral', t0 = performance.now();
+const H = P.holandeses;
+const railDir = V3(Math.cos(padG.rotation.y), 0, -Math.sin(padG.rotation.y));     // sentido em que a Torre Móvel recua
+const padSide = V3(-railDir.z, 0, railDir.x);
+const claMid = V3((PAD[0] + AERO[0])/2, 0, (PAD[1] + AERO[1])/2);
+const toBridge = V3(-HALF, 0, 0).sub(claMid).normalize();
+const padCam = V3(PAD[0], 0, PAD[1]).addScaledVector(railDir, -12).addScaledVector(padSide, 11);
+const views = {
+  geral:  { pos:[300, 900, 1650], target:[0, 0, 0] },
+  vao:    { pos:[70, 26, 80], target:[0, 12, 0] },
+  sl:     { pos:[HALF - 60, 45, 90], target:[(HALF + H[0])/2, 2, H[1]/2] },
+  al:     { pos:[-HALF + 60, 70, -SIDE*140], target:[-HALF - 120, 1, 0] },
+  cla:    { pos:claMid.clone().addScaledVector(toBridge, 650).setY(420).toArray(), target:claMid.toArray() },
+  pad:    { pos:[padCam.x, 6, padCam.z], target:[PAD[0], 1.6, PAD[1]] },
+};
+function setView(name){
+  mode = name; t0 = performance.now();
+  document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === name));
+  controls.enabled = !['sobrevoo','dirigir','trem','foguete'].includes(name);
+  if (views[name]) { camera.position.set(...views[name].pos); controls.target.set(...views[name].target); }
+}
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
+setView('geral');
+document.getElementById('hide').onclick = e => {
+  const p = document.getElementById('panel'), hid = p.style.display === 'none';
+  p.style.display = hid ? '' : 'none'; e.target.textContent = hid ? 'Ocultar painel' : 'Mostrar painel';
+};
+function toggle(id, fn){ const b = document.getElementById(id); b.onclick = () => { const on = !b.classList.contains('on'); b.classList.toggle('on', on); fn(on); }; }
+toggle('tTrem', on => { trainGroup.visible = on; });
+let night = false;
+const curSun = SUN_DIR.clone();
+toggle('noite', on => {
+  night = on; const S = on ? NIGHT : DAY, u = skyMat.uniforms;
+  u.top.value.set(S.top); u.horizon.value.set(S.horizon); u.below.value.set(S.below); u.sunCol.value.set(on ? 0x223355 : S.sun); u.sunDir.value.copy(S.sunDir);
+  curSun.copy(S.sunDir); scene.fog.color.set(S.fog); updateEnv();
+  hemi.intensity = on ? 0.08 : 0.55; sun.intensity = on ? 0.25 : 2.6; sun.color.set(on ? 0x8fa8ff : 0xfff1d6);
+  waterMat.envMapIntensity = on ? 0.5 : 0.9;
+  lampMat.color.set(on ? 0xffd27a : 0x555555); cables.material.color.set(on ? 0x9fd0ff : 0xf4f4f4);
+  edgeLit.emissive.set(on ? 0x6a4a22 : 0x000000); towerMat.emissive.set(on ? 0x2c3a4c : 0x000000);
+  farolTop.material.emissive.set(on ? 0xff4a2a : 0x000000);
+  red.emissive.set(on ? 0x551010 : 0x000000);
+});
+
+// lançamento do foguete (animação ilustrativa)
+let launchT = -1;
+const rv = V3(0, 0, 0), rp = V3(0, 0.46, 0), Y1 = V3(0, 1, 0);
+const NE = (() => { const c = Math.cos(-ANG), s = Math.sin(-ANG), m = [1/Math.SQRT2, -1/Math.SQRT2]; return V3(m[0]*c - m[1]*s, 0, m[0]*s + m[1]*c); })();
+const azLocal = NE.clone().applyAxisAngle(Y1, -padG.rotation.y);       // lança para nordeste, sobre o mar
+const countdown = addLabel('', V3(0, 6, 0), 'cla big', padG); countdown.visible = false;
+const btnL = document.getElementById('lancar');
+btnL.onclick = () => { if (launchT >= 0) return; launchT = 0; rv.set(0, 0, 0); rp.set(0, 0.46, 0); btnL.classList.add('on'); setView('foguete'); };
+const tmpV = V3(0, 0, 0), wp = V3(0, 0, 0);
+function spawnPuff(pos, v, s0, grow, life){ if (puffs.length < SMOKE) puffs.push({ p:pos.clone(), v, s0, grow, life, age:0 }); }
+function updateLaunch(dt){
+  if (launchT < 0) return;
+  launchT += dt; const t = launchT;
+  countdown.visible = t < 3.6;
+  countdown.element.textContent = t < 3 ? 'T‑' + (3 - Math.floor(t)) : 'Ignição';
+  const lit = t >= 3 && t < 30;
+  flame.visible = lit; flameLight.intensity = lit ? 40 : 0;
+  if (lit){
+    flame.scale.set(1 + Math.random()*0.25, 1.2 + Math.random()*0.6 + Math.min(t - 3, 6)*0.5, 1 + Math.random()*0.25);
+    rocket.getWorldPosition(wp);
+    if (t < 6) for (let k = 0; k < 2; k++){
+      const a = Math.random()*6.28;
+      spawnPuff(V3(PAD[0], GROUND + 0.3, PAD[1]), V3(Math.cos(a)*(2 + Math.random()*3), 0.3 + Math.random()*0.6, Math.sin(a)*(2 + Math.random()*3)), 0.3, 0.8, 9);
+    }
+    if (t > 3.8 && wp.y < 260) spawnPuff(wp, V3((Math.random() - 0.5)*0.4, -0.5, (Math.random() - 0.5)*0.4), 0.15, 0.35 + wp.y*0.004, 7);
+  }
+  if (t > 3.8 && t < 30){
+    // empuxo ao longo do eixo do foguete; depois de ~6 s começa a inclinar para nordeste
+    const tilt = THREE.MathUtils.clamp((t - 9) / 14, 0, 1) * 0.75;
+    const ax = Y1.clone().multiplyScalar(Math.cos(tilt)).addScaledVector(azLocal, Math.sin(tilt));
+    rv.addScaledVector(ax, 1.6 * dt); rv.y -= 0.35 * dt;
+    rp.addScaledVector(rv, dt);
+    rocket.position.copy(rp);
+    if (rv.lengthSq() > 1e-4) rocket.quaternion.setFromUnitVectors(Y1, tmpV.copy(rv).normalize());
+  }
+  if (t > 42){   // novo foguete na plataforma
+    launchT = -1; rocket.position.set(0, 0.46, 0); rocket.quaternion.identity(); flame.visible = false; flameLight.intensity = 0;
+    btnL.classList.remove('on'); if (mode === 'foguete') setView('pad');
+  }
+}
+function updateSmoke(dt){
+  for (let i = puffs.length - 1; i >= 0; i--){
+    const f = puffs[i]; f.age += dt; if (f.age > f.life){ puffs.splice(i, 1); continue; }
+    f.p.addScaledVector(f.v, dt); f.v.multiplyScalar(1 - 0.6*dt); f.v.y += 0.05*dt;
+  }
+  puffs.forEach((f, i) => { const s = (f.s0 + f.age*f.grow) * (f.age > f.life*0.7 ? (f.life - f.age)/(f.life*0.3) : 1); M.compose(f.p, Q.identity(), tmpV.set(s, s*0.8, s)); smoke.setMatrixAt(i, M); });
+  smoke.count = puffs.length; smoke.instanceMatrix.needsUpdate = true;
+}
+
+// ============ Loop ============
+const clock = new THREE.Clock();
+const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), S1 = V3(1,1,1);
+function placeOnPath(path, s, off, flip){
+  const { pos, dir } = path.at(s);
+  const side = V3(-dir.z, 0, dir.x).normalize();
+  pos.addScaledVector(side, off); pos.y += 0.05;
+  Q.setFromUnitVectors(X1, flip ? dir.clone().negate() : dir);
+  return pos;
+}
+// sombras: a caixa de sombra acompanha o ponto observado e cresce com a distância da câmera
+const focus = V3(0, 0, 0), camDir = V3(0, 0, 0);
+function updateShadow(){
+  if (controls.enabled) focus.copy(controls.target);
+  else { camera.getWorldDirection(camDir); focus.copy(camera.position).addScaledVector(camDir, 50); }
+  const half = THREE.MathUtils.clamp(camera.position.distanceTo(focus) * 0.75, 25, 420), sc = sun.shadow.camera;
+  if (Math.abs(sc.right - half) > half*0.08){ sc.left = sc.bottom = -half; sc.right = sc.top = half; sc.updateProjectionMatrix(); }
+  focus.y = 0; sun.target.position.copy(focus); sun.position.copy(focus).addScaledVector(curSun, 1500);
+}
+const bussola = document.querySelector('#bussola svg');
+const NORTH = (() => { const c = Math.cos(-ANG), s = Math.sin(-ANG); return V3(s, 0, -c); })();   // (0,-1) do mapa girado
+let frame = 0;
+function animate(){
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  waterNormal.offset.set(t*0.0032, t*0.0019);
+
+  for (const a of agents){
+    a.s += a.dir * a.v * dt;
+    if (a.s > a.path.len) a.s -= a.path.len; if (a.s < 0) a.s += a.path.len;
+    const pos = placeOnPath(a.path, a.s, a.off, a.dir < 0);
+    M.compose(pos, Q, S1); a.mesh.setMatrixAt(a.i, M);
+  }
+  cars.instanceMatrix.needsUpdate = trucks.instanceMatrix.needsUpdate = true;
+
+  // vai e volta entre as estações, com parada em cada ponta
+  const TL = WAGONS * 1.6, RUN = trainPath.len - TL, DWELL = 30, CYCLE = 2 * (RUN + DWELL);
+  trainS = (trainS + 8 * dt) % CYCLE;
+  let u = trainS, tdir;
+  if (u < DWELL) { trainHead = TL; tdir = 1; }
+  else if ((u -= DWELL) < RUN) { trainHead = TL + u; tdir = 1; }
+  else if ((u -= RUN) < DWELL) { trainHead = trainPath.len; tdir = -1; }
+  else { trainHead = trainPath.len - (u - DWELL); tdir = -1; }
+  trainDir = tdir;
+  for (let k=0;k<WAGONS;k++){
+    const s = tdir > 0 ? trainHead - k*1.6 : trainHead - TL + k*1.6;
+    const pos = placeOnPath(trainPath, s, 0, tdir < 0); pos.y -= 0.02;
+    M.compose(pos, Q, S1); trainMesh.setMatrixAt(k, M);
+  }
+  trainMesh.instanceMatrix.needsUpdate = true;
+
+  updateLaunch(dt); updateSmoke(dt);
+
+  const el = (performance.now() - t0) / 1000;
+  if (mode === 'sobrevoo') {
+    const u = (el / 70) % 1, x = HALF + 120 - u * (2*HALF + 240);
+    camera.position.set(x + 30, deckH(Math.max(-HALF, Math.min(HALF, x))) + 14 + Math.sin(u*Math.PI)*30, -SIDE*(Math.sin(u*Math.PI*2)*40 + 55));
+    camera.lookAt(x - 60, deckH(Math.max(-HALF, Math.min(HALF, x - 60))), 0);
+  } else if (mode === 'dirigir') {
+    const a = agents[2], cur = a.path.at(a.s), ahead = a.path.at(a.s + 8);
+    const side = V3(-cur.dir.z, 0, cur.dir.x).normalize();
+    camera.position.copy(cur.pos).addScaledVector(side, a.off).add(V3(0, 0.75, 0)).addScaledVector(cur.dir, -1.2);
+    camera.lookAt(ahead.pos.clone().addScaledVector(side, a.off).add(V3(0, 0.6, 0)));
+  } else if (mode === 'trem') {
+    const head = trainPath.at(trainDir > 0 ? trainHead : trainHead - WAGONS*1.6);
+    if (trainDir < 0) head.dir.negate();
+    const side = V3(-head.dir.z, 0, head.dir.x).normalize();
+    camera.position.copy(head.pos).addScaledVector(head.dir, -30).addScaledVector(side, 14).add(V3(0, 10, 0));
+    camera.lookAt(head.pos.clone().addScaledVector(head.dir, 10));
+  } else if (mode === 'foguete') {
+    rocket.getWorldPosition(wp);
+    const back = 22 + Math.max(0, wp.y - GROUND) * 0.55;
+    camera.position.set(PAD[0], 0, PAD[1]).addScaledVector(railDir, -back*0.75).addScaledVector(padSide, back*0.6).setY(GROUND + 3 + (wp.y - GROUND)*0.45);
+    camera.lookAt(wp.x, wp.y + 0.6, wp.z);
+  } else controls.update();
+
+  sky.position.copy(camera.position);
+  updateShadow();
+  if (frame++ % 6 === 0) for (const [o, md] of labels) o.visible = camera.position.distanceTo(o.position) < md;
+  camera.getWorldDirection(camDir); camDir.y = 0; camDir.normalize();
+  const ang = Math.atan2(NORTH.dot(V3(-camDir.z, 0, camDir.x)), NORTH.dot(camDir));
+  bussola.style.transform = `rotate(${-ang}rad)`;
+
+  renderer.render(scene, camera); labelRenderer.render(scene, camera);
+  if (frame === 2) hideLoading();
+}
+function hideLoading(){ const c = document.getElementById('carregando'); if (!c) return; c.style.opacity = 0; setTimeout(() => c.remove(), 700); }
+animate();
+setTimeout(hideLoading, 2500);
+window.__cena = { scene, camera, controls, setView, renderer, render: () => { controls.update(); sky.position.copy(camera.position); updateShadow(); for (const [o, md] of labels) o.visible = camera.position.distanceTo(o.position) < md; renderer.render(scene, camera); labelRenderer.render(scene, camera); },
+  launch: () => btnL.onclick(), step: dt => { updateLaunch(dt); updateSmoke(dt); } };
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

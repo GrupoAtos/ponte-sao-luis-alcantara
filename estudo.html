@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estudo Ponte São Luís–Alcântara</title>
+<style>
+  :root {
+    --bg:#f6f4ef; --card:#ffffff; --text:#1d232a; --muted:#5d6670; --line:#e3ded3;
+    --accent:#c4651f; --accent2:#1f6f8b; --good:#2e7d4f; --warn:#b5651d; --soft:#f1ebe0;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg:#11161b; --card:#182028; --text:#e8edf1; --muted:#9aa7b2; --line:#2a3540;
+    --accent:#f0a05a; --accent2:#6cc0dc; --good:#6fcf97; --warn:#f2b366; --soft:#1e2830; } }
+  :root[data-theme="dark"] { --bg:#11161b; --card:#182028; --text:#e8edf1; --muted:#9aa7b2; --line:#2a3540;
+    --accent:#f0a05a; --accent2:#6cc0dc; --good:#6fcf97; --warn:#f2b366; --soft:#1e2830; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width:980px; margin:0 auto; padding:40px 20px 80px; }
+  header .kicker { color:var(--accent); font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:12px; }
+  h1 { font-size:34px; line-height:1.15; margin:6px 0 10px; }
+  .lead { font-size:18px; color:var(--muted); margin:0 0 20px; max-width:760px; }
+  h2 { font-size:23px; margin:48px 0 12px; padding-top:8px; border-top:1px solid var(--line); }
+  h3 { font-size:17px; margin:24px 0 8px; }
+  p { margin:0 0 12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin:18px 0; }
+  .stat { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .stat b { display:block; font-size:26px; line-height:1.1; color:var(--accent2); font-variant-numeric:tabular-nums; }
+  .stat span { color:var(--muted); font-size:13px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0; }
+  .callout { background:var(--soft); border-left:4px solid var(--accent); border-radius:8px; padding:12px 16px; margin:16px 0; font-size:15px; }
+  .callout.warn { border-color:var(--warn); }
+  table { width:100%; border-collapse:collapse; font-size:14.5px; font-variant-numeric:tabular-nums; }
+  th, td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:600; }
+  td.n, th.n { text-align:right; white-space:nowrap; }
+  tr.total td { font-weight:700; border-top:2px solid var(--text); }
+  .scroll { overflow-x:auto; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:4px 8px; margin:14px 0; }
+  .tag { display:inline-block; font-size:11px; padding:1px 7px; border-radius:20px; background:var(--soft); color:var(--muted); margin-left:4px; white-space:nowrap; }
+  .tag.rail { background:rgba(196,101,31,.15); color:var(--accent); }
+  ul { padding-left:20px; margin:0 0 12px; } li { margin:4px 0; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:700px){ .two { grid-template-columns:1fr; } h1 { font-size:27px; } }
+  .bar { height:10px; border-radius:6px; background:var(--accent2); }
+  .barrow { display:grid; grid-template-columns:190px 1fr 90px; gap:10px; align-items:center; font-size:14px; margin:6px 0; }
+  @media (max-width:600px){ .barrow { grid-template-columns:120px 1fr 70px; } }
+  .muted { color:var(--muted); }
+  .src { font-size:13px; color:var(--muted); }
+  .src li { margin:3px 0; word-break:break-word; }
+  a { color:var(--accent2); }
+  .legend-est { font-size:13px; color:var(--muted); }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="kicker">Estudo conceitual · novembro de 2026</div>
+  <h1>Ponte rodoferroviária São Luís – Alcântara</h1>
+  <p class="lead">Traçado na menor travessia da Baía de São Marcos, ligado às ruas que já existem, com corredor de trem de passageiros. Este estudo traz uma faixa de orçamento, o efeito na economia durante e depois da obra, os tempos de travessia e casos parecidos no mundo.</p>
+  <p class="legend-est">Valores marcados como <b>estimativa</b> são cálculos deste estudo, de ordem de grandeza. Não substituem projeto básico, sondagens, estudo de tráfego nem EIA/RIMA.</p>
+</header>
+
+<div class="grid">
+  <div class="stat"><b>12,7 km</b><span>ponte sobre a água (menor travessia, litoral do OpenStreetMap)</span></div>
+  <div class="stat"><b>~15 min</b><span>Ponta d'Areia → centro de Alcântara de carro (hoje: 1h20 a 3h+)</span></div>
+  <div class="stat"><b>R$ 13–18 bi</b><span>ponte com pista e trem de passageiros (estimativa)</span></div>
+  <div class="stat"><b>~12 min</b><span>de trem entre as estações de São Luís e Alcântara (estimativa)</span></div>
+</div>
+
+<h2>1. Traçado e ligação com as ruas existentes</h2>
+<p>O traçado foi medido sobre o litoral do OpenStreetMap. A menor distância entre a Ilha de São Luís e o continente é de 12,68 km: vai da Ponta de São Marcos / Ponta d'Areia até a margem leste de Alcântara, uns 3 km a leste do centro histórico. A ponte segue essa linha, com um ajuste de 150 m no pouso em São Luís para não passar por cima de prédios.</p>
+
+<div class="two">
+  <div class="card">
+    <h3>Cabeceira São Luís</h3>
+    <ul>
+      <li>A ponte toca a costa em 2°29′24″S 44°18′21″W e desce por uma <b>rampa em curva de 310 m</b> (≈4,5%) até a rotatória onde termina a <b>Av. dos Holandeses (MA‑203)</b>. Essa avenida é a via principal da orla norte, com 2 a 5 faixas e 60 km/h.</li>
+      <li>Daí em diante o trânsito usa a malha que já existe: Av. dos Holandeses, Av. Prof. Mário Meirelles, Av. Prof. Carlos Cunha e Av. Colares Moreira (todas a menos de 3 km).</li>
+      <li>Não é preciso abrir avenida nova dentro do bairro. A obra se limita à rampa e à reforma da rotatória.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Cabeceira Alcântara</h3>
+    <ul>
+      <li>A ponte chega a uma área sem ocupação urbana. O prédio mais próximo mapeado no OSM está a 1,8 km.</li>
+      <li>Uma <b>via nova de 2,8 km</b> leva até o <b>Anel do Contorno / MA‑106</b>, por onde já se chega à cidade e ao interior.</li>
+      <li>O <b>centro histórico tombado não é cruzado</b>: o trânsito pesado segue pelo anel, e as ruas coloniais (Rua Grande, Rua Direita, Rua da Amargura) continuam como estão.</li>
+      <li>A estação de trem fica ao lado da cabeceira, longe do casario.</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Verificação dos prédios</h3>
+<div class="scroll"><table>
+  <tr><th>Item</th><th>Resultado</th></tr>
+  <tr><td>Prédios do OSM analisados</td><td>651 contornos de edificação nas duas cabeceiras. Só 42 informam andares ou altura; nos outros, a altura do modelo 3D é estimada pelo tipo (apartamentos ≈ 12 andares, residências ≈ 2).</td></tr>
+  <tr><td>Rampa reta pelo ponto mais curto</td><td><b>7 edificações</b> na faixa de 80 m, incluindo o <b>Edifício Tech Office</b>. Descartada.</td></tr>
+  <tr><td>Rampa adotada (pouso 150 m a sudoeste)</td><td><b>2 edificações</b> no OSM dentro da faixa. A ponte fica 55 m mais longa. Outra opção é acompanhar o eixo da Av. São Marcos, que deixa 1 edificação na faixa de 30 m.</td></tr>
+  <tr><td>Alcântara</td><td>Nenhuma edificação no traçado. A mais próxima é o "Hotel de Trânsito dos Oficiais", a 1,8 km, o que indica área ligada à Aeronáutica e ao CLA. É preciso consultar o DCTA/FAB.</td></tr>
+</table></div>
+<div class="callout warn">O mapeamento de prédios do OpenStreetMap na Ponta d'Areia está incompleto, e muitas torres residenciais não aparecem. Antes de qualquer decisão é preciso fazer levantamento cadastral em campo e confirmar desapropriações com a Prefeitura de São Luís.</div>
+
+<h2>2. Convivência com a Base de Alcântara (CLA)</h2>
+<p>A maquete 3D agora mostra o <b>Centro de Lançamento de Alcântara</b> nas posições do OpenStreetMap: perímetro, pista 09/27, plataforma com a Torre Móvel de Integração, casamata, para‑raios, Lançador Universal, setor de apoio técnico, telemedidas e estradas internas. O botão "Lançar foguete" é só uma animação ilustrativa.</p>
+<div class="scroll"><table>
+  <tr><th>Medida (sobre o OSM)</th><th>Resultado</th></tr>
+  <tr><td>Área dentro do perímetro mapeado</td><td>~85 km². O próprio OSM marca esse contorno como aproximado; o limite oficial precisa ser confirmado com a FAB.</td></tr>
+  <tr><td>Cabeceira da ponte em Alcântara</td><td><b>Fora da base</b>, a 1,2 km do perímetro.</td></tr>
+  <tr><td>Via nova (cabeceira → Anel do Contorno)</td><td><b>Não entra no perímetro</b>. A menor distância até ele é 1,2 km.</td></tr>
+  <tr><td>Plataforma de lançamento → cabeceira</td><td>~10 km</td></tr>
+  <tr><td>Pista 09/27 (2,6 km) → torres do vão central</td><td>9,5 a 10,1 km · da cabeceira até a pista: 4,0 km</td></tr>
+</table></div>
+<div class="card">
+  <ul>
+    <li><b>Espaço aéreo.</b> As torres de 240 m ficam a ~10 km da pista do CLA. É preciso analisar com o DECEA/COMAER as superfícies de proteção do aeródromo e as rotas de aproximação. A maquete já mostra a luz de balizamento no topo das torres.</li>
+    <li><b>Lançamentos.</b> Os foguetes saem para norte e nordeste, sobre o oceano. A ponte fica ao sul, do lado oposto. Mesmo assim, as interdições marítimas e aéreas dos dias de lançamento precisam ser coordenadas com o CLA e a Marinha.</li>
+    <li><b>Logística da base.</b> A ponte tira do ferry o transporte de pessoal e de cargas grandes. Quem trabalha no CLA passa a poder morar em São Luís. Com o Acordo de Salvaguardas Tecnológicas com os EUA (assinado em 2019) e os primeiros lançamentos comerciais (Innospace, da Coreia do Sul, em 2023), essa demanda pode crescer.</li>
+    <li><b>Segurança.</b> A via nova não passa pela base, mas haverá mais circulação perto do perímetro. Controle de acesso e cercas devem ser revistos com a FAB.</li>
+    <li><b>Comunidades quilombolas.</b> O entorno do CLA tem territórios quilombolas e um histórico de remoções. A ponte não pode servir de pretexto para ampliar a base sem a consulta prévia prevista na Convenção 169 da OIT.</li>
+  </ul>
+</div>
+
+<h2>3. Corredor de trem de passageiros</h2>
+<div class="card">
+  <ul>
+    <li>Duas linhas ao lado da pista, entre uma <b>estação elevada na cabeceira de São Luís</b>, com integração aos ônibus da Av. dos Holandeses, e a <b>estação e pátio de Alcântara</b>, junto à via nova.</li>
+    <li>~15 km entre as estações, cerca de 12 minutos de viagem (estimativa).</li>
+    <li>O perfil da ponte sobe com rampa de até ≈1,5% para dar 80 m de altura livre no vão central. Para trem de passageiros isso é aceitável, sem precisar de locomotiva auxiliar nem túnel.</li>
+    <li>A ponte não tem ligação ferroviária com o Porto do Itaqui. Se um dia houver trem de carga, a conexão terá de ser estudada à parte, por terra.</li>
+  </ul>
+</div>
+
+<h2>4. Orçamento possível (ordem de grandeza)</h2>
+<p>Referência principal: a ponte <b>Salvador–Itaparica</b> (12,4 km, contrato atual de R$ 11,6 bi com o sistema viário), cerca de R$ 935 mi/km. Ela é a obra mais parecida em curso no Brasil: mesma extensão, ambiente marinho e consórcio internacional. A parte do trem foi estimada proporcionalmente, pela largura extra do tabuleiro.</p>
+<div class="scroll"><table>
+  <tr><th>Componente</th><th>Base de cálculo</th><th class="n">Mínimo</th><th class="n">Máximo</th></tr>
+  <tr><td>Ponte principal rodoviária, 4 faixas, vão estaiado de 700 m</td><td>12,7 km × R$ 0,75–0,95 bi/km</td><td class="n">R$ 9,5 bi</td><td class="n">R$ 12,1 bi</td></tr>
+  <tr><td>Acréscimo do trem de passageiros (tabuleiro mais largo, via, sinalização, estais extras)</td><td>+20 a 30% sobre a ponte</td><td class="n">R$ 2,0 bi</td><td class="n">R$ 3,5 bi</td></tr>
+  <tr><td>Acessos em São Luís (rampa de 310 m, rotatória da Holandeses, desapropriações)</td><td>estimativa</td><td class="n">R$ 0,2 bi</td><td class="n">R$ 0,4 bi</td></tr>
+  <tr><td>Acessos e estações (via de 2,8 km em Alcântara, ligação com a MA‑106, estação elevada em São Luís, estação e pátio em Alcântara)</td><td>estimativa</td><td class="n">R$ 0,3 bi</td><td class="n">R$ 0,6 bi</td></tr>
+  <tr><td>Estudos, licenciamento, consulta quilombola, compensações</td><td>≈ 5–7%</td><td class="n">R$ 0,7 bi</td><td class="n">R$ 1,2 bi</td></tr>
+  <tr class="total"><td>Cenário B · ponte com pista e trem de passageiros</td><td></td><td class="n">≈ R$ 13 bi</td><td class="n">≈ R$ 18 bi</td></tr>
+  <tr><td class="muted">Cenário A · só rodoviária, sem trem</td><td class="muted">ponte + acessos + estudos</td><td class="n muted">≈ R$ 10 bi</td><td class="n muted">≈ R$ 13 bi</td></tr>
+</table></div>
+<div class="callout warn"><b>Risco de custo:</b> obras desse tipo costumam terminar acima do orçamento inicial. O valor de Salvador–Itaparica passou de R$ 5,3 bi para R$ 11,6 bi ao longo dos anos, e a Confederation Bridge (Canadá) estourou o orçamento em uns 33%. Numa estimativa desta fase (sem projeto nem sondagens), é prudente trabalhar com −30% a +50%. O prazo de obra ficaria em torno de <b>6 a 7 anos</b> (Salvador–Itaparica prevê ~5 anos depois do início em 2026).</div>
+
+<h3>Como pagar</h3>
+<p>O pedágio sozinho não paga a obra. Com, por exemplo, 7 mil veículos/dia a R$ 25, a receita fica em torno de R$ 64 mi/ano (estimativa). Isso cobre operação e manutenção, mas não o investimento. O caminho mais provável é uma <b>PPP com contraprestação pública</b> (como em Salvador–Itaparica, com R$ 3 bi da União pelo Novo PAC), somada à tarifa do trem de passageiros.</p>
+
+<h2>5. Impacto na economia durante a obra</h2>
+<div class="grid">
+  <div class="stat"><b>6 a 9 mil</b><span>empregos diretos no pico (Salvador–Itaparica projeta ~7 mil)</span></div>
+  <div class="stat"><b>~130–185 mil</b><span>empregos-ano no total (diretos + indiretos), cenário B: BNDES, 10,2 por R$ 1 mi</span></div>
+  <div class="stat"><b>~170–235 mil</b><span>mesma conta pelo coeficiente da CBIC (13 por R$ 1 mi, inclui efeito-renda)</span></div>
+</div>
+<ul>
+  <li><b>Demanda local:</b> concreto, aço, brita, transporte marítimo, alojamento e alimentação. Parte grande pode ficar no Maranhão se houver exigência de conteúdo local.</li>
+  <li><b>Arrecadação:</b> ISS sobre serviços nos dois municípios. Para Alcântara, cujo PIB é de ~R$ 126 mi/ano, uma obra desse porte representa um choque de demanda muito grande.</li>
+  <li><b>Efeito no PIB do estado:</b> na Confederation Bridge, o PIB da Ilha do Príncipe Eduardo cresceu mais de 5% durante a obra. Aqui o efeito relativo seria menor, porque a economia de São Luís (~R$ 36,5 bi) é bem maior.</li>
+  <li><b>Pontos de atenção:</b> inflação de aluguel e serviços em Alcântara, pressão sobre saúde e saneamento, e risco de ocupação irregular perto do canteiro.</li>
+</ul>
+
+<h2>6. Depois da obra: travessia, moradia e trabalho</h2>
+<h3>Tempo de travessia</h3>
+<div class="card">
+  <div class="barrow"><span>Ferry + estrada (hoje)</span><div class="bar" style="width:100%; background:var(--warn)"></div><span>3h a 4h+</span></div>
+  <div class="barrow"><span>Lancha Praia Grande (hoje)</span><div class="bar" style="width:40%; background:var(--warn)"></div><span>~1h20*</span></div>
+  <div class="barrow"><span>Carro pela ponte</span><div class="bar" style="width:8%"></div><span>~15 min</span></div>
+  <div class="barrow"><span>Trem São Luís → Alcântara</span><div class="bar" style="width:6%; background:var(--accent)"></div><span>~12 min</span></div>
+  <p class="src" style="margin:10px 0 0">Ferry: Ponta da Espera → Cujupe dura "pouco mais de 1h30", mais a espera (houve filas de mais de 15 h em janeiro de 2026) e o trecho por terra até Alcântara. *A lancha depende da maré e sai em poucos horários. A ponte: 12,7 km + rampa + 2,8 km + ~1 km na cidade ≈ 17 km a 70–80 km/h (estimativa). Trem: ~15 km entre as estações, a ~80 km/h com paradas de aceleração (estimativa).</p>
+</div>
+
+<h3>Morar de um lado, trabalhar do outro</h3>
+<div class="two">
+  <div class="card">
+    <h3>Quem mora em Alcântara e trabalha em São Luís</h3>
+    <ul>
+      <li>Uns 15 a 25 minutos até a orla norte, tempo parecido com o de muitos deslocamentos dentro da própria ilha em hora de pico.</li>
+      <li>Acesso diário a empregos, faculdades e hospitais da capital, que hoje dependem de barco e maré. Em setembro de 2026, um paciente morreu depois de a ambulância esperar ~3 h pelo ferry.</li>
+      <li>Terreno mais barato pode atrair famílias de São Luís, como em Øresund, onde 96% dos pendulares moram no lado sueco, mais barato.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Quem mora em São Luís e trabalha em Alcântara</h3>
+    <ul>
+      <li>Técnicos e militares do <b>Centro de Lançamento de Alcântara</b>, que tem cerca de 20 negociações comerciais em andamento (2026).</li>
+      <li>Turismo de um dia no centro histórico: guias, pousadas, restaurantes.</li>
+      <li>Logística: peças e equipamentos do CLA por estrada em vez de barcaça.</li>
+    </ul>
+  </div>
+</div>
+<div class="callout">
+  <b>Quantos fariam esse trajeto?</b> Em Øresund, que liga duas regiões metropolitanas de milhões de habitantes, são ~21,6 mil pendulares (4º tri de 2024), e os salários de quem mora perto da ponte subiram ~16% em 8 anos. Aqui a relação é assimétrica: 1,04 milhão de habitantes em São Luís e 18,5 mil em Alcântara. Uma faixa razoável é <b>3 a 8 mil viagens pendulares/dia em 10 anos</b> e <b>4 a 10 mil veículos/dia</b> no total (estimativa). Para comparar, o ferry levou 371,5 mil veículos em 2017 (~1 mil/dia), e o tráfego do Great Belt subiu 127% no primeiro ano depois da ponte.
+</div>
+
+<h3>Cuidados que definem se o efeito será bom</h3>
+<ul>
+  <li><b>Território quilombola:</b> 84,6% da população de Alcântara é quilombola, em 122 localidades. A obra exige <b>consulta livre, prévia e informada (Convenção 169 da OIT)</b>, e a expansão urbana precisa de plano diretor que proteja esses territórios da especulação.</li>
+  <li><b>Patrimônio:</b> o centro histórico de Alcântara é tombado pelo IPHAN e o de São Luís é Patrimônio Mundial. É preciso estudo de impacto visual do vão estaiado.</li>
+  <li><b>Navegação:</b> o Itaqui movimentou ~34–37 Mt/ano em 2024–2025, com navios muito altos. A posição do canal sob a ponte, o gabarito aéreo (contando a maré de ~7 m) e a proteção contra colisão nos pilares dependem da Marinha / Capitania dos Portos.</li>
+  <li><b>Ambiente:</b> manguezais, correntes fortes de macromaré e fauna marinha. Exige EIA/RIMA no IBAMA.</li>
+  <li><b>CLA:</b> zonas de segurança de lançamento. Precisa de compatibilização com DCTA/AEB.</li>
+  <li><b>Transição do ferry:</b> operadores e trabalhadores das embarcações perdem demanda. A Baixada Maranhense continua precisando do ferry até ter acesso rodoviário bom a partir de Alcântara.</li>
+</ul>
+
+<h2>7. Casos parecidos no mundo</h2>
+<div class="scroll"><table>
+  <tr><th>Obra</th><th>Extensão</th><th>Ano</th><th>Custo (original)</th><th>Trem</th><th>O que mostra</th></tr>
+  <tr><td><b>Rio–Niterói</b> (Brasil)</td><td>13,3 km (8,8 sobre o mar)</td><td>1974</td><td>~US$ 120–130 mi (fontes divergem)</td><td>Não</td><td>Antes, o caminho por terra passava de 100 km. Virou o eixo do dia a dia da região metropolitana.</td></tr>
+  <tr><td><b>Salvador–Itaparica</b> (Brasil)</td><td>12,4 km, vão de 682 m</td><td>em obra, prev. 2031</td><td>R$ 11,6 bi (PPP, CCCC/CCECC)</td><td>Não</td><td>O caso mais parecido. Ferry de ~1 h com filas de mais de 4 h vira ~10 min de carro. ~7 mil empregos na obra.</td></tr>
+  <tr><td><b>Øresund</b> (Dinamarca–Suécia)</td><td>7,8 km ponte + 4 km túnel</td><td>2000</td><td>DKK 30,1 bi (~€ 4 bi)</td><td>Sim</td><td>~21,6 mil pendulares; 15 mi passageiros de trem/ano; salários +16% perto da ponte.</td></tr>
+  <tr><td><b>Great Belt</b> (Dinamarca)</td><td>~18 km (pontes + túnel ferroviário)</td><td>1997–98</td><td>DKK 21,4 bi (preços de 1988)</td><td>Sim</td><td>Travessia de carro de ~90 min para 10–15 min; tráfego +127% no 1º ano.</td></tr>
+  <tr><td><b>Vasco da Gama</b> (Lisboa)</td><td>12,3 km sobre a água</td><td>1998</td><td>€ 897 mi (35% da UE)</td><td>Não</td><td>~52 mil carros/dia. Abriu a margem sul de Lisboa para moradia.</td></tr>
+  <tr><td><b>25 de Abril + trem</b> (Lisboa)</td><td>2,3 km</td><td>1966 / trem 1999</td><td>—</td><td>Sim</td><td>Trem posto depois na ponte: hoje 133 mil passageiros/dia na Fertagus.</td></tr>
+  <tr><td><b>Confederation</b> (Canadá)</td><td>12,9 km</td><td>1997</td><td>C$ 1,3 bi (orçado em C$ 1 bi)</td><td>Não</td><td>Travessia de ~12 min; turismo de 740 mil para 1,2 mi no 1º ano; PIB da província +5% na obra.</td></tr>
+  <tr><td><b>Penang 2ª ponte</b> (Malásia)</td><td>24 km (16,9 sobre a água)</td><td>2014</td><td>RM 4,5 bi</td><td>Não</td><td>Ligou uma ilha-cidade ao continente pelo lado industrial.</td></tr>
+  <tr><td><b>Hong Kong–Zhuhai–Macau</b></td><td>55 km com acessos</td><td>2018</td><td>~US$ 19–20 bi</td><td>Não</td><td>Viagem de ~4 h para ~45 min; mostra o risco de demanda abaixo do previsto.</td></tr>
+  <tr><td><b>Chesapeake Bay Bridge-Tunnel</b> (EUA)</td><td>28,3 km</td><td>1964</td><td>US$ 200 mi (pago com títulos de pedágio)</td><td>Não</td><td>Substituiu o ferry e foi financiada só com pedágio.</td></tr>
+  <tr><td><b>Pelješac</b> (Croácia)</td><td>2,4 km</td><td>2022</td><td>€ 420–550 mi (€ 357 mi da UE)</td><td>Não</td><td>Construída por consórcio chinês com fundo europeu, mesmo modelo de Salvador.</td></tr>
+</table></div>
+<p class="muted">Lição geral: as ligações fixas que deram mais resultado (Øresund, Great Belt, 25 de Abril) <b>levam trem</b> e foram acompanhadas de planejamento urbano. As que só trocaram o ferry por pista tiveram ganhos fortes de tempo, mas ganhos econômicos que dependeram do que veio depois (turismo, indústria, moradia).</p>
+
+<h2>8. Próximos passos sugeridos</h2>
+<ol>
+  <li>Levantamento batimétrico, geotécnico e de correntes no eixo Ponta d'Areia–Alcântara.</li>
+  <li>Estudo de tráfego e de demanda do trem de passageiros (pendulares, turismo, CLA, Baixada).</li>
+  <li>Consulta à Marinha (canal e gabarito para os navios do Itaqui), ao DCTA/FAB e ao DECEA (CLA, pista e espaço aéreo) e ao IPHAN.</li>
+  <li>Consulta prévia às comunidades quilombolas de Alcântara.</li>
+  <li>Comparar as alternativas: ponte só rodoviária e ponte com trem de passageiros.</li>
+  <li>Estruturar uma PPP com aporte federal, nos moldes de Salvador–Itaparica.</li>
+</ol>
+
+<h2>Fontes</h2>
+<ul class="src">
+  <li>Litoral, ruas, trilhos e prédios: © OpenStreetMap contributors (ODbL), extração em 11/11/2026. CLA (perímetro, pista, torres e prédios): OpenStreetMap, relação 9194325, extração em 12/11/2026.</li>
+  <li>Salvador–Itaparica: <a href="https://movimentoeconomico.com.br/infraestrutura-2/2026/10/22/ponte-salvador-itaparica-chega-a-21-estacas-no-mar-e-aguarda-navio-de-cravacao/">Movimento Econômico (out/2026)</a> · <a href="https://www.gazetadopovo.com.br/brasil/estagio-ponte-salvador-itaparica/">Gazeta do Povo</a> · <a href="https://www.ba.gov.br/trabalho/noticias/2025-02/5834/construcao-da-ponte-salvador-itaparica-deve-gerar-mais-de-7-mil-empregos-com">Governo da Bahia</a> · <a href="https://atarde.com.br/bahia/ponte-salvador-itaparica-quanto-tempo-levara-a-travessia-de-carro-1385486">A Tarde</a></li>
+  <li>Rio–Niterói: <a href="https://en.wikipedia.org/wiki/Rio–Niterói_Bridge">Wikipedia</a></li>
+  <li>Øresund: <a href="https://en.wikipedia.org/wiki/Øresund_Bridge">Wikipedia</a> · <a href="https://www.thelocal.se/20250812/traffic-over-oresund-bridge-sets-new-record-in-first-half-of-2025">The Local</a> · <a href="https://www.inkl.com/news/denmark-and-sweden-s-oresund-bridge-turns-25-have-the-benefits-run-in-both-directions">inkl</a> · <a href="https://docs.iza.org/dp12885.pdf">IZA DP 12885</a></li>
+  <li>Great Belt: <a href="https://en.wikipedia.org/wiki/Great_Belt_Fixed_Link">Wikipedia</a> · Vasco da Gama: <a href="https://www.wikiwand.com/en/Vasco_da_Gama_Bridge">Wikiwand</a> · 25 de Abril: <a href="https://observador.pt/2026/08/06/60-anos-de-ponte-25-de-abril-preferida-na-travessia-comboio-da-ponte-revolucionou-mobilidade-entre-margens-do-tejo/">Observador</a></li>
+  <li>Confederation: <a href="https://en.wikipedia.org/wiki/Confederation_Bridge">Wikipedia</a> · HZMB: <a href="https://ice.org.uk/what-is-civil-engineering/infrastructure-projects/the-hong-kong-zhuhai-macao-bridge-hzmb-hong-kong-section">ICE</a> · Penang: <a href="https://ice.org.uk/what-is-civil-engineering/infrastructure-projects/penang-bridges">ICE</a> · Chesapeake: <a href="https://virginiaplaces.org/transportation/cbbt.html">Virginia Places</a> · Pelješac: <a href="https://en.wikipedia.org/wiki/Pelje%C5%A1ac_Bridge">Wikipedia</a></li>
+  <li>Travessia atual: <a href="https://pt.wikipedia.org/wiki/Travessia_São_Luís-Alcântara">Wikipedia</a> · <a href="https://oimparcial.com.br/noticias/2026/01/revolta-na-baixada-nao-vai-passar/">O Imparcial (jan/2026)</a> · <a href="https://m.imirante.com/noticias/maranhao/2026/09/11/jovem-que-necessitava-de-transferencia-hospitalar-morre-no-ma-ambulancia-teria-enfrentado-longa-espera-por-ferryboat">Imirante (set/2026)</a> · <a href="https://www.viajenaviagem.com/destino/sao-luis/alcantara-maranhao/">Viaje na Viagem</a></li>
+  <li>População e PIB: <a href="https://www.ibge.gov.br/en/cities-and-states/ma/sao-luis.html">IBGE</a> · <a href="https://pt.wikipedia.org/wiki/Alcântara_(Maranhão)">Wikipedia – Alcântara</a> · <a href="https://agenciadenoticias.ibge.gov.br/en/agencia-news/40724-2022-census-brazil-has-8-441-quilombola-localities-24-of-them-in-maranhao.html">IBGE – quilombolas</a></li>
+  <li>CLA: <a href="https://www2.fab.mil.br/cla">FAB – CLA</a> · <a href="https://pt.wikipedia.org/wiki/Centro_de_Lançamento_de_Alcântara">Wikipedia</a> · <a href="https://economicnewsbrasil.com.br/2026/06/20/base-de-alcantara-interesse-global-lancamentos/">Economic News Brasil</a> · Itaqui: <a href="https://movimentoeconomico.com.br/?p=111501">Movimento Econômico</a> · <a href="https://agenciainfra.com/blog/vli-quer-crescer-no-terminal-portuario-de-sao-luis-diz-diretor-de-operacoes/">Agência Infra</a></li>
+  <li>Multiplicadores: <a href="https://diariodocomercio.com.br/?p=348422">BNDES via Diário do Comércio</a> · <a href="https://cbic.org.br/wp-content/uploads/2024/04/apresentacao-investimentos-equacionamento-deficit-habitacional-infraestrutura.pdf">CBIC</a></li>
+</ul>
+</main>
+</body>
+</html>
