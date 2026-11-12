@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apoie a Ponte São Luís–Baixada</title>
+<meta name="description" content="Iniciativa popular pela ponte São Luís–Alcântara. Deixe seu apoio e seu comentário.">
+<meta property="og:title" content="Apoie a Ponte São Luís–Baixada">
+<meta property="og:description" content="Iniciativa popular, sem vínculo com governos. Deixe seu apoio e seu comentário.">
+<meta property="og:image" content="https://pontesaoluisbaixada.com.br/midia/capa.jpg">
+<style>
+  :root {
+    --bg:#f6f4ef; --card:#ffffff; --text:#1d232a; --muted:#5d6670; --line:#e3ded3;
+    --accent:#c4651f; --accent2:#1f6f8b; --good:#2e7d4f; --soft:#f1ebe0; --err:#b3261e;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg:#11161b; --card:#182028; --text:#e8edf1; --muted:#9aa7b2; --line:#2a3540;
+    --accent:#f0a05a; --accent2:#6cc0dc; --good:#6fcf97; --soft:#1e2830; --err:#f2b8b5; } }
+  :root[data-theme="dark"] { --bg:#11161b; --card:#182028; --text:#e8edf1; --muted:#9aa7b2; --line:#2a3540;
+    --accent:#f0a05a; --accent2:#6cc0dc; --good:#6fcf97; --soft:#1e2830; --err:#f2b8b5; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width:860px; margin:0 auto; padding:28px 16px 80px; }
+  nav { display:flex; flex-wrap:wrap; gap:8px 16px; font-size:14px; margin-bottom:24px; }
+  nav a { color:var(--accent2); text-decoration:none; } nav a:hover { text-decoration:underline; }
+  .kicker { color:var(--accent); font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:12px; }
+  h1 { font-size:32px; line-height:1.15; margin:6px 0 10px; }
+  h2 { font-size:22px; margin:40px 0 12px; }
+  .lead { font-size:18px; color:var(--muted); margin:0 0 18px; }
+  .callout { background:var(--soft); border-left:4px solid var(--accent); border-radius:8px; padding:12px 16px; margin:16px 0; font-size:15px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; margin:14px 0; }
+  .contador { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .contador b { font-size:44px; line-height:1; color:var(--accent2); font-variant-numeric:tabular-nums; }
+  .cidades { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .cidades span { font-size:13px; background:var(--soft); border-radius:20px; padding:2px 10px; color:var(--muted); }
+  form { display:grid; gap:12px; }
+  .linha { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:640px){ .linha { grid-template-columns:1fr; } h1 { font-size:26px; } }
+  label { font-size:14px; font-weight:600; display:grid; gap:4px; }
+  label small { font-weight:400; color:var(--muted); }
+  input, select, textarea { font:inherit; color:var(--text); background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:9px 11px; width:100%; }
+  textarea { min-height:110px; resize:vertical; }
+  input:focus, select:focus, textarea:focus { outline:2px solid var(--accent2); outline-offset:1px; }
+  .armadilha { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  button { font:inherit; font-weight:700; background:var(--accent); color:#fff; border:0; border-radius:10px; padding:12px 18px; cursor:pointer; justify-self:start; }
+  button:disabled { opacity:.6; cursor:wait; }
+  .msg { font-size:14px; min-height:1.4em; margin:0; }
+  .msg.ok { color:var(--good); } .msg.erro { color:var(--err); }
+  .aviso { font-size:13px; color:var(--muted); margin:0; }
+  .mural { display:grid; gap:10px; }
+  .item { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .item header { font-size:14px; margin-bottom:4px; } .item header b { color:var(--text); }
+  .item header span { color:var(--muted); }
+  .item p { margin:0; white-space:pre-wrap; word-break:break-word; }
+  .mais { background:transparent; color:var(--accent2); border:1px solid var(--line); font-weight:600; }
+  .vazio { color:var(--muted); }
+  footer { margin-top:56px; padding-top:18px; border-top:1px solid var(--line); font-size:14px; color:var(--muted); }
+  footer p { margin:0 0 8px; }
+  a { color:var(--accent2); }
+</style>
+</head>
+<body>
+<main>
+<nav>
+  <a href="index.html">Maquete 3D</a>
+  <a href="estudo.html">Estudo</a>
+  <a href="estudo.html#video">Vídeo</a>
+  <a href="apoie.html"><b>Apoie</b></a>
+</nav>
+
+<div class="kicker">Iniciativa popular</div>
+<h1>Apoie a ponte São Luís – Baixada</h1>
+<p class="lead">Uma ponte rodoferroviária sobre a Baía de São Marcos, ligando São Luís a Alcântara e à Baixada Maranhense em cerca de 15 minutos. Quanto mais gente apoiar, mais força tem o pedido.</p>
+
+<div class="callout"><b>Este projeto não tem ligação com o Governo do Maranhão, o Governo Federal nem com as prefeituras.</b> É um desejo da população, apresentado por iniciativa popular para chamar a atenção dos governos estadual e federal, das prefeituras e de investidores privados para a importância e o impacto positivo da ponte.</div>
+
+<div class="card">
+  <div class="contador"><b id="total">–</b><span id="totaltxt">pessoas já apoiaram a ponte</span></div>
+  <div class="cidades" id="cidades"></div>
+</div>
+
+<h2>Deixe seu apoio</h2>
+<div class="card">
+  <form id="form" novalidate>
+    <div class="linha">
+      <label><span>Nome</span> <input name="nome" required maxlength="80" autocomplete="name"></label>
+      <label><span>Cidade <small>(opcional)</small></span> <input name="cidade" maxlength="80" placeholder="Ex.: São Luís, Alcântara, Pinheiro" autocomplete="address-level2"></label>
+    </div>
+    <label><span>Você é <small>(opcional)</small></span>
+      <select name="perfil">
+        <option value="">Prefiro não dizer</option>
+        <option>Morador de São Luís</option>
+        <option>Morador da Baixada</option>
+        <option>Morador de Alcântara</option>
+        <option>Empresário</option>
+        <option>Estudante</option>
+        <option>Profissional da área</option>
+        <option>Outro</option>
+      </select>
+    </label>
+    <label><span>Comentário <small>(opcional, até 1000 caracteres)</small></span>
+      <textarea name="comentario" maxlength="1000" placeholder="Por que a ponte é importante para você?"></textarea>
+    </label>
+    <div class="armadilha" aria-hidden="true"><label>Site <input name="site" tabindex="-1" autocomplete="off"></label></div>
+    <button type="submit" id="enviar">Apoiar a ponte</button>
+    <p class="msg" id="msg" role="status"></p>
+    <p class="aviso">Seu nome, cidade, perfil e comentário aparecem publicamente nesta página. Não pedimos e-mail nem telefone. Comentários ofensivos podem ser removidos.</p>
+  </form>
+</div>
+
+<h2>O que as pessoas estão dizendo</h2>
+<div class="mural" id="mural"><p class="vazio">Carregando…</p></div>
+<p><button class="mais" id="mais" hidden>Ver mais comentários</button></p>
+
+<footer>
+  <p><b>Iniciativa popular, sem vínculo com governos ou prefeituras.</b></p>
+  <p>Ideia: <b>PAULO SERRA</b>. A maquete 3D, o estudo, o vídeo e este site foram feitos com inteligência artificial, pelo <b>Claude</b> (Anthropic).</p>
+  <p>Estudo conceitual, não é projeto de engenharia. Mapas © OpenStreetMap contributors (ODbL).</p>
+</footer>
+</main>
+<script>
+const API = 'https://uotmiguogyjfucznewaj.supabase.co/rest/v1/rpc/';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvdG1pZ3VvZ3lqZnVjem5ld2FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIxMDIyODQsImV4cCI6MjA2NzY3ODI4NH0.L9jdJ3NYKr3JXTQkPGuoKIFz80TIpAJAFtX1bbYsoCQ';
+const rpc = (fn, body) => fetch(API + fn, { method:'POST', headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json' }, body:JSON.stringify(body) })
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+const $ = id => document.getElementById(id);
+const fmt = new Intl.NumberFormat('pt-BR');
+const quando = d => new Date(d).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+let ultimo = null;
+
+function el(tag, txt) { const e = document.createElement(tag); if (txt != null) e.textContent = txt; return e; }
+function item(m) {
+  const box = el('article'); box.className = 'item';
+  const h = el('header'); h.append(el('b', m.nome));
+  const extra = [m.perfil, m.cidade, quando(m.criado_em)].filter(Boolean).join(' · ');
+  h.append(el('span', ' · ' + extra));
+  box.append(h, el('p', m.comentario));
+  return box;
+}
+async function carregar(mais) {
+  const d = await rpc('ponte_mural', { p_limite: 20, p_antes: mais ? ultimo : null });
+  $('total').textContent = fmt.format(d.total);
+  $('totaltxt').textContent = d.total === 1 ? 'pessoa já apoiou a ponte' : 'pessoas já apoiaram a ponte';
+  const c = $('cidades'); c.replaceChildren(...d.cidades.map(x => el('span', `${x.cidade} · ${fmt.format(x.n)}`)));
+  const mural = $('mural');
+  if (!mais) mural.replaceChildren();
+  d.comentarios.forEach(m => mural.append(item(m)));
+  if (!mural.children.length) mural.append(Object.assign(el('p', 'Ainda não há comentários. Seja o primeiro!'), { className:'vazio' }));
+  if (d.comentarios.length) ultimo = d.comentarios[d.comentarios.length - 1].id;
+  $('mais').hidden = d.comentarios.length < 20;
+}
+$('mais').onclick = () => carregar(true).catch(() => {});
+$('form').onsubmit = async e => {
+  e.preventDefault();
+  const f = new FormData(e.target), msg = $('msg'), bt = $('enviar');
+  if ((f.get('nome') || '').trim().length < 2) { msg.className = 'msg erro'; msg.textContent = 'Informe seu nome.'; return; }
+  bt.disabled = true; msg.className = 'msg'; msg.textContent = 'Enviando…';
+  try {
+    const r = await rpc('ponte_manifestar', { p_nome:f.get('nome'), p_cidade:f.get('cidade'), p_perfil:f.get('perfil'), p_comentario:f.get('comentario'), p_site:f.get('site') });
+    if (!r.ok) throw new Error(r.erro || 'Não foi possível enviar.');
+    msg.className = 'msg ok'; msg.textContent = 'Obrigado! Seu apoio foi registrado.';
+    e.target.reset(); await carregar(false);
+  } catch (err) {
+    msg.className = 'msg erro'; msg.textContent = /^\d+$/.test(err.message) ? 'Não foi possível enviar agora. Tente de novo.' : err.message;
+  } finally { bt.disabled = false; }
+};
+carregar(false).catch(() => { $('mural').replaceChildren(Object.assign(el('p', 'Não foi possível carregar os comentários agora.'), { className:'vazio' })); });
+</script>
+</body>
+</html>
