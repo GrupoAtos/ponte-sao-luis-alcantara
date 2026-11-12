@@ -36,11 +36,25 @@
   #bussola { position:fixed; right:22px; bottom:22px; width:64px; height:64px; border-radius:50%; background:var(--panel);
     border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(6px); pointer-events:none; }
   #bussola svg { width:100%; height:100%; transition:transform .08s linear; }
+  #bussola { pointer-events:auto; cursor:pointer; }
+  #nav { position:fixed; right:22px; bottom:96px; display:flex; flex-direction:column; gap:6px; }
+  #nav button { width:40px; height:40px; padding:0; font-size:18px; line-height:1; border-radius:10px; background:var(--panel);
+    backdrop-filter:blur(6px); }
+  #nav button.txt { font-size:11px; font-weight:700; }
+  #irpara { position:fixed; left:50%; top:16px; transform:translateX(-50%); display:flex; gap:6px; align-items:center;
+    background:var(--panel); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:6px 8px; font-size:12.5px; white-space:nowrap; }
+  #irpara select { background:#1d3346; color:var(--text); border:1px solid rgba(255,255,255,.15); border-radius:7px; padding:5px 8px; font:inherit; max-width:60vw; }
+  #escala { position:fixed; right:100px; bottom:34px; font-size:11px; color:var(--text); text-align:center;
+    background:var(--panel); border-radius:6px; padding:3px 8px 4px; pointer-events:none; }
+  #escala i { display:block; height:5px; border:2px solid var(--text); border-top:0; margin-top:2px; }
+  @media (max-width:1150px){ #irpara { left:382px; transform:none; } #irpara select { max-width:calc(100vw - 560px); } #dica { left:382px; transform:none; } }
+  #dica { position:fixed; left:50%; bottom:64px; transform:translateX(-50%); background:var(--panel); border-radius:8px; padding:6px 12px;
+    font-size:12px; color:var(--muted); transition:opacity .8s; pointer-events:none; white-space:nowrap; }
   #carregando { position:fixed; inset:0; display:grid; place-items:center; background:var(--bg); z-index:10; font-size:14px;
     color:var(--muted); transition:opacity .6s; }
   #carregando b { display:block; color:var(--text); font-size:18px; margin-bottom:6px; text-align:center; }
   .panel hr { border:0; border-top:1px solid rgba(255,255,255,.08); margin:12px 0 0; }
-  @media (max-width:600px){ .panel{ right:16px; width:auto; font-size:12px; max-height:45%; } #bussola{ width:48px; height:48px; } }
+  @media (max-width:600px){ .panel{ right:16px; width:auto; font-size:12px; max-height:calc(55% - 60px); top:106px; } #bussola{ width:48px; height:48px; } #nav{ right:18px; bottom:80px; } #hide{ top:62px; } #dica{ display:none; } #irpara{ left:16px; right:16px; transform:none; } #irpara select{ flex:1; max-width:none; } #escala{ right:76px; bottom:26px; } }
 </style>
 <script src="costa.js"></script>
 <script src="cena.js"></script>
@@ -112,12 +126,20 @@
 
   <div class="btns" style="margin-top:12px"><a class="link" href="estudo.html" target="_blank">Abrir estudo: orçamento, economia e casos no mundo →</a> <a class="link" href="estudo.html#video" target="_blank">▶ Assistir ao vídeo do estudo</a> <a class="link" href="apoie.html" target="_blank" style="background:#c4651f">♥ Apoie a ponte</a></div>
   <p class="note"><b>Iniciativa popular</b>, sem vínculo com governos ou prefeituras. Ideia: PAULO SERRA. Maquete, estudo e vídeo feitos com inteligência artificial, pelo Claude (Anthropic).</p>
-  <p class="note">Arraste para girar · roda para zoom · botão direito para mover.<br>
+  <p class="note"><b>Navegação:</b> arraste para mover o mapa · botão direito (ou Ctrl + arrastar, ou dois dedos) para girar e inclinar · roda ou pinça para zoom, no ponto do cursor · duplo clique para aproximar ali · teclado: setas/WASD movem, Q/E giram, +/− zoom, N norte, T vista de cima.<br>
   Litoral, ruas, trilhos e prédios © OpenStreetMap (ODbL). Alturas de prédios sem dado no OSM são estimadas.
   Maquete conceitual — não é projeto de engenharia.</p>
 </div>
 <button id="hide">Ocultar painel</button>
-<div id="bussola"><svg viewBox="0 0 64 64"><polygon points="32,8 38,32 32,28 26,32" fill="#ff6b5a"/><polygon points="32,56 38,32 32,36 26,32" fill="#9db3c4"/><text x="32" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#fff" dy="-8">N</text></svg></div>
+<div id="irpara"><label for="lugar">Ir para</label><select id="lugar"><option value="">Escolha um lugar…</option></select></div>
+<div id="nav">
+  <button id="zIn" title="Aproximar (+)">+</button>
+  <button id="zOut" title="Afastar (−)">−</button>
+  <button id="cima" class="txt" title="Vista de cima (T)">2D</button>
+</div>
+<div id="escala"><span>–</span><i></i></div>
+<div id="dica">Arraste para mover · botão direito para girar · roda para zoom · duplo clique para aproximar</div>
+<div id="bussola" title="Apontar para o norte (N)"><svg viewBox="0 0 64 64"><polygon points="32,8 38,32 32,28 26,32" fill="#ff6b5a"/><polygon points="32,56 38,32 32,36 26,32" fill="#9db3c4"/><text x="32" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#fff" dy="-8">N</text></svg></div>
 <div id="carregando"><div><b>Ponte São Luís – Alcântara</b>Montando a maquete 3D…</div></div>
 
 <script type="module">
@@ -170,8 +192,17 @@ const NIGHT = { top:0x02060f, horizon:0x16233a, below:0x0c1626, sun:0x9fb4ff, fo
 scene.fog = new THREE.Fog(DAY.fog, 1400, 7800);
 const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.3, 14000);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+controls.enableDamping = true; controls.dampingFactor = 0.08;
 controls.maxPolarAngle = Math.PI * 0.49;
+controls.minDistance = 2; controls.maxDistance = 6500;
+controls.screenSpacePanning = false;          // arrastar move sobre o chão, como num mapa
+controls.zoomToCursor = true;                 // zoom no ponto do cursor
+controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
+controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE };
+// Ctrl/Shift + arrastar com o botão esquerdo = girar (trackpad sem botão direito)
+renderer.domElement.addEventListener('pointerdown', e => {
+  controls.mouseButtons.LEFT = (e.ctrlKey || e.metaKey || e.shiftKey) ? THREE.MOUSE.ROTATE : THREE.MOUSE.PAN;
+}, true);
 const hemi = new THREE.HemisphereLight(0xdff0ff, 0x4a5a3a, 0.55); scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff1d6, 2.6); sun.position.copy(SUN_DIR).multiplyScalar(1500); scene.add(sun, sun.target);
 sun.castShadow = true;
@@ -819,13 +850,139 @@ const views = {
             return { pos:[c[0] + sx*1500, 1500, c[1] + sz*1500], target:[c[0], 0, c[1]] }; })(),
   pad:    { pos:[padCam.x, 6, padCam.z], target:[PAD[0], 1.6, PAD[1]] },
 };
+// ---- voo suave da câmera
+let fly = null;
+const ease = k => k < 0.5 ? 4*k*k*k : 1 - Math.pow(-2*k + 2, 3) / 2;
+function flyTo(pos, target, dur){
+  const p1 = pos.isVector3 ? pos.clone() : V3(...pos), t1 = target.isVector3 ? target.clone() : V3(...target);
+  const far = Math.max(camera.position.distanceTo(p1), controls.target.distanceTo(t1));
+  fly = { p0:camera.position.clone(), t0:controls.target.clone(), p1, t1, s:performance.now(),
+          d:(dur ?? THREE.MathUtils.clamp(0.7 + far/2500, 0.7, 2.2)) * 1000, lift: far > 600 ? far*0.25 : 0 };
+}
+function stepFly(){
+  if (!fly) return;
+  const k = Math.min(1, (performance.now() - fly.s) / fly.d), e = ease(k);
+  camera.position.lerpVectors(fly.p0, fly.p1, e); camera.position.y += Math.sin(Math.PI*k) * fly.lift;
+  controls.target.lerpVectors(fly.t0, fly.t1, e);
+  if (k >= 1) fly = null;
+}
+controls.addEventListener('start', () => { fly = null; });
+let firstView = true;
 function setView(name){
   mode = name; t0 = performance.now();
   document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === name));
   controls.enabled = !['sobrevoo','dirigir','trem','foguete'].includes(name);
-  if (views[name]) { camera.position.set(...views[name].pos); controls.target.set(...views[name].target); }
+  if (views[name]) {
+    if (firstView || name === 'pad') { fly = null; camera.position.set(...views[name].pos); controls.target.set(...views[name].target); }
+    else flyTo(views[name].pos, views[name].target);
+  }
+  firstView = false;
+}
+// vista de um ponto mantendo a direção atual da câmera
+function olhar(x, z, dist, tilt = 0.9){
+  setView('livre');
+  const off = camera.position.clone().sub(controls.target); off.y = 0;
+  if (off.lengthSq() < 1e-6) off.set(0, 0, 1);
+  off.normalize().multiplyScalar(Math.cos(tilt) * dist).setY(Math.sin(tilt) * dist);
+  flyTo(V3(x, 0, z).add(off), V3(x, 0, z));
+}
+const ITQ = T(D.itaqui), METC = (() => { const pts = [...metroFeito.flat(), ...metroPrev]; return pts.reduce((s, p) => [s[0]+p[0]/pts.length, s[1]+p[1]/pts.length], [0, 0]); })();
+const LUGARES = [
+  ['Ponte · vão central estaiado', 0, 0, 260],
+  ['São Luís · Ponta d\'Areia (cabeceira)', HALF, 0, 260],
+  ['Av. dos Holandeses (MA‑203)', P.holandeses[0], P.holandeses[1], 320],
+  ['Centro histórico de São Luís', P.centroSL[0], P.centroSL[1], 300],
+  ['Av. Metropolitana', METC[0], METC[1], 1900],
+  ['Porto do Itaqui', ITQ[0], ITQ[1], 600],
+  ['Alcântara · cabeceira', -HALF, 0, 260],
+  ['Alcântara · centro histórico', P.alcantara[0], P.alcantara[1], 260],
+  ['Anel do Contorno · MA‑106', P.anel[0], P.anel[1], 300],
+  ['Base de Alcântara (CLA)', claMid.x, claMid.z, 900],
+  ['Plataforma de lançamento', PAD[0], PAD[1], 90],
+  ['Ilha de São Luís inteira', 1500, 0, 5200],
+];
+{
+  const sel = document.getElementById('lugar');
+  LUGARES.forEach(([n], i) => sel.add(new Option(n, i)));
+  sel.onchange = () => { const l = LUGARES[sel.value]; if (l) olhar(l[1], l[2], l[3]); sel.blur(); };
 }
 document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
+// ---- zoom, norte, vista de cima, duplo clique e teclado
+function zoomBy(f){
+  if (!controls.enabled) setView('livre');
+  const off = camera.position.clone().sub(controls.target).multiplyScalar(f);
+  const d = THREE.MathUtils.clamp(off.length(), controls.minDistance, controls.maxDistance); off.setLength(d);
+  flyTo(controls.target.clone().add(off), controls.target.clone(), 0.45);
+}
+function norte(topo){
+  if (!controls.enabled) setView('livre');
+  const off = camera.position.clone().sub(controls.target), d = off.length();
+  const pol = topo ? 0.02 : Math.max(0.15, Math.acos(THREE.MathUtils.clamp(off.y / d, -1, 1)));
+  const h = Math.sin(pol) * d;
+  flyTo(controls.target.clone().addScaledVector(NORTH, -h).setY(controls.target.y + Math.cos(pol) * d), controls.target.clone(), 0.8);
+}
+document.getElementById('zIn').onclick = () => zoomBy(0.55);
+document.getElementById('zOut').onclick = () => zoomBy(1.8);
+document.getElementById('cima').onclick = () => norte(true);
+document.getElementById('bussola').onclick = () => norte(false);
+{
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), plano = new THREE.Plane(V3(0, 1, 0), -GROUND), hit = V3(0, 0, 0);
+  renderer.domElement.addEventListener('dblclick', e => {
+    ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    if (!ray.ray.intersectPlane(plano, hit)) return;
+    if (!controls.enabled) setView('livre');
+    const off = camera.position.clone().sub(controls.target).multiplyScalar(0.45);
+    if (off.length() < 6) off.setLength(6);
+    const t = hit.clone().setY(0);
+    flyTo(t.clone().add(off), t, 0.9);
+  });
+}
+const teclas = new Set();
+addEventListener('keydown', e => {
+  if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName) || e.metaKey || e.ctrlKey) return;
+  const k = e.key.toLowerCase();
+  if (k === 'n') return norte(false);
+  if (k === 't') return norte(true);
+  if (['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d','q','e','+','=','-','_'].includes(k)){
+    teclas.add(k); e.preventDefault();
+    if (!controls.enabled) setView('livre');
+    fly = null;
+  }
+});
+addEventListener('keyup', e => teclas.delete(e.key.toLowerCase()));
+addEventListener('blur', () => teclas.clear());
+const fwd = V3(0, 0, 0), rgt = V3(0, 0, 0), UP = V3(0, 1, 0);
+function stepTeclas(dt){
+  if (!teclas.size) return;
+  const off = camera.position.clone().sub(controls.target), d = off.length(), v = d * 0.9 * dt;
+  camera.getWorldDirection(fwd); fwd.y = 0; fwd.normalize(); rgt.crossVectors(fwd, UP);
+  const mv = V3(0, 0, 0);
+  if (teclas.has('w') || teclas.has('arrowup')) mv.add(fwd);
+  if (teclas.has('s') || teclas.has('arrowdown')) mv.sub(fwd);
+  if (teclas.has('d') || teclas.has('arrowright')) mv.add(rgt);
+  if (teclas.has('a') || teclas.has('arrowleft')) mv.sub(rgt);
+  if (mv.lengthSq()) { mv.normalize().multiplyScalar(v); camera.position.add(mv); controls.target.add(mv); }
+  let rot = 0; if (teclas.has('q')) rot += 1.2*dt; if (teclas.has('e')) rot -= 1.2*dt;
+  let z = 1; if (teclas.has('+') || teclas.has('=')) z *= 1 - 1.3*dt; if (teclas.has('-') || teclas.has('_')) z *= 1 + 1.3*dt;
+  if (rot || z !== 1){
+    off.applyAxisAngle(UP, rot).multiplyScalar(z);
+    off.setLength(THREE.MathUtils.clamp(off.length(), controls.minDistance, controls.maxDistance));
+    camera.position.copy(controls.target).add(off);
+  }
+}
+// ---- escala gráfica
+const escala = document.getElementById('escala'), escTxt = escala.querySelector('span'), escBar = escala.querySelector('i');
+function updateEscala(){
+  const d = camera.position.distanceTo(controls.enabled ? controls.target : focus);
+  const mPx = d * 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / innerHeight * 10;   // metros por pixel
+  const alvo = mPx * 110, base = Math.pow(10, Math.floor(Math.log10(alvo)));
+  const nice = [5, 2, 1].map(f => f * base).find(v => v <= alvo) || base;
+  escBar.style.width = (nice / mPx).toFixed(0) + 'px';
+  escTxt.textContent = nice >= 1000 ? (nice/1000).toLocaleString('pt-BR') + ' km' : nice + ' m';
+}
+setTimeout(() => { const di = document.getElementById('dica'); di.style.opacity = 0; setTimeout(() => di.remove(), 900); }, 9000);
+if (innerWidth < 600) setTimeout(() => document.getElementById('hide').click(), 0);
 setView('geral');
 document.getElementById('hide').onclick = e => {
   const p = document.getElementById('panel'), hid = p.style.display === 'none';
@@ -970,11 +1127,16 @@ function animate(){
     const back = 22 + Math.max(0, wp.y - GROUND) * 0.55;
     camera.position.set(PAD[0], 0, PAD[1]).addScaledVector(railDir, -back*0.75).addScaledVector(padSide, back*0.6).setY(GROUND + 3 + (wp.y - GROUND)*0.45);
     camera.lookAt(wp.x, wp.y + 0.6, wp.z);
-  } else controls.update();
+  } else {
+    stepFly(); stepTeclas(dt); controls.update();
+    // não deixa o mapa "fugir": alvo fica dentro da área modelada
+    const tg = controls.target, lim = 3300, cx = THREE.MathUtils.clamp(tg.x, -lim, lim), cz = THREE.MathUtils.clamp(tg.z, -lim, lim);
+    if (cx !== tg.x || cz !== tg.z){ camera.position.x += cx - tg.x; camera.position.z += cz - tg.z; tg.x = cx; tg.z = cz; }
+  }
 
   sky.position.copy(camera.position);
   updateShadow();
-  if (frame++ % 6 === 0) for (const [o, md] of labels) o.visible = camera.position.distanceTo(o.position) < md;
+  if (frame++ % 6 === 0) { for (const [o, md] of labels) o.visible = camera.position.distanceTo(o.position) < md; updateEscala(); }
   camera.getWorldDirection(camDir); camDir.y = 0; camDir.normalize();
   const ang = Math.atan2(NORTH.dot(V3(-camDir.z, 0, camDir.x)), NORTH.dot(camDir));
   bussola.style.transform = `rotate(${-ang}rad)`;
