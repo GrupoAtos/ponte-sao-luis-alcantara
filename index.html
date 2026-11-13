@@ -191,10 +191,11 @@
       <li><b>~15 min</b>de São Luís a Alcântara</li>
       <li><b>R$ 13–18 bi</b>custo estimado</li>
     </ul>
-    <p>Aqui você explora a ponte numa <b>maquete 3D</b>, lê o <b>estudo</b> de custo e impacto econômico e <b>deixa seu apoio</b>.</p>
+    <p>Aqui você <b>joga construindo a ponte</b> fase por fase, explora a <b>maquete 3D</b>, lê o <b>estudo</b> de custo e impacto econômico e <b>deixa seu apoio</b>.</p>
     <p class="aviso">Não é um projeto do governo nem das prefeituras. É um desejo da população, apresentado para chamar a atenção dos governos estadual e federal, das prefeituras e de investidores. Feito com inteligência artificial (Claude, da Anthropic). Ideia: PAULO SERRA.</p>
     <div class="acoes">
-      <button class="pri" id="introOk">Explorar a maquete 3D</button>
+      <button class="pri" id="introJogar">▶ Jogar: construa a ponte</button>
+      <button class="sec" id="introOk">Explorar a maquete 3D</button>
       <a class="apo" href="apoie.html">♥ Apoiar a ponte</a>
       <a class="sec" href="estudo.html">Ler o estudo</a>
     </div>
@@ -525,12 +526,12 @@ function buildDeck(path, { width, top=asphalt, rails=false, skipPier=()=>false, 
   const deck = new THREE.InstancedMesh(unitBox, concrete, n), surf = new THREE.InstancedMesh(unitBox, top, n);
   const edge = new THREE.InstancedMesh(unitBox, edgeMat, n*2);
   const railI = rails ? new THREE.InstancedMesh(unitBox, steelRail, n*4) : null;
-  const cols = [], M = new THREE.Matrix4(), Q = new THREE.Quaternion();
+  const cols = [], M = new THREE.Matrix4(), Q = new THREE.Quaternion(), segX = new Float32Array(n);
   for (let i=0;i<n;i++){
     const a = path.at(i*spacing), b = path.at(Math.min((i+1)*spacing, path.len));
     const d = b.pos.clone().sub(a.pos), L = d.length(); if (L < 0.01) continue;
     Q.setFromUnitVectors(X1, d.clone().normalize());
-    const c = a.pos.clone().add(b.pos).multiplyScalar(0.5);
+    const c = a.pos.clone().add(b.pos).multiplyScalar(0.5); segX[i] = c.x;
     M.compose(c.clone().add(V3(0,-0.3,0)), Q, V3(L+0.05, 0.6, width)); deck.setMatrixAt(i, M);
     M.compose(c.clone().add(V3(0,0.02,0)), Q, V3(L+0.05, 0.05, width-0.3)); surf.setMatrixAt(i, M);
     const side = V3(-d.z, 0, d.x).normalize();
@@ -548,14 +549,15 @@ function buildDeck(path, { width, top=asphalt, rails=false, skipPier=()=>false, 
   });
   deck.castShadow = colI.castShadow = edge.castShadow = true; surf.receiveShadow = deck.receiveShadow = true;
   [deck, surf, edge, colI, railI].forEach(o => o && group.add(o));
-  return group;
+  return { deck, surf, edge, colI, railI, segX, colX: cols.map(c => c[0].x) };
 }
 
 // Ponte principal (4 faixas)
 const edgeLit = new THREE.MeshStandardMaterial({ color:0xd8d5ce, roughness:0.6, emissive:0x000000 });
-buildDeck(roadPath, { width:3.2, edgeMat:edgeLit, skipPier: p => Math.abs(p.x) < MAIN + 2 && Math.abs(p.z) < 3 });
+const mainParts = buildDeck(roadPath, { width:3.2, edgeMat:edgeLit, skipPier: p => Math.abs(p.x) < MAIN + 2 && Math.abs(p.z) < 3 });
 
 // Sinalização: faixas tracejadas entre as pistas e barreira central (New Jersey)
+let marcas;
 {
   const dash = [], bar = [];
   for (let s = 0; s < roadPath.len; s += 3) for (const o of [-0.72, 0.72]) dash.push([s, o]);
@@ -569,6 +571,7 @@ buildDeck(roadPath, { width:3.2, edgeMat:edgeLit, skipPier: p => Math.abs(p.x) <
   dash.forEach(([s, o], i) => put(dI, i, s, o, 0.05));
   bar.forEach((s, i) => put(bI, i, s, 0, 0.045));
   bI.castShadow = true; scene.add(dI, bI);
+  marcas = { dI, bI, dX: dash.map(([s]) => roadPath.at(s).pos.x), bX: bar.map(s => roadPath.at(s).pos.x) };
 }
 
 // ============ Corredor ferroviário (trem de passageiros São Luís ↔ Alcântara) ============
@@ -580,7 +583,7 @@ const railMainPts = [];
 for (let x = HALF + 12; x >= -HALF; x -= 5) railMainPts.push(V3(x, deckH(Math.min(x, HALF)), RAIL_Z));
 for (let x = -HALF - 5; x >= -HALF - 90; x -= 5) railMainPts.push(V3(x, GROUND + 0.06 + (SHORE_H - GROUND) * smooth((x + HALF + 90) / 90), RAIL_Z));
 const railMain = new Path3(railMainPts);
-buildDeck(railMain, { width:1.8, rails:true, top:ballast, group:trainGroup, skipPier: p => Math.abs(p.x) < MAIN + 2 });
+const railParts = buildDeck(railMain, { width:1.8, rails:true, top:ballast, group:trainGroup, skipPier: p => Math.abs(p.x) < MAIN + 2 });
 // estação elevada de São Luís, na cabeceira (integração com ônibus na Av. dos Holandeses)
 {
   const plat = new THREE.Mesh(new THREE.BoxGeometry(16, 0.2, 1.2), concrete);
@@ -608,7 +611,7 @@ let trainS = 0, trainHead = 0, trainDir = 1;
 
 // ============ Torres estaiadas + estais ============
 const towerMat = new THREE.MeshStandardMaterial({ color:0xe9e6df, roughness:0.55, emissive:0x000000 });
-const TOP = 24, cablePts = [];
+const TOP = 24, cablePts = [], torres = [];
 for (const tx of [-MAIN, MAIN]) {
   const g = new THREE.Group(), base = -3, spread = 7.5;
   const legLen = Math.hypot(TOP - base, spread);
@@ -620,7 +623,7 @@ for (const tx of [-MAIN, MAIN]) {
   const head = new THREE.Mesh(new THREE.BoxGeometry(1.4, 4, 1.4), towerMat); head.position.y = TOP + 1.5; g.add(head);
   const footing = new THREE.Mesh(new THREE.CylinderGeometry(5, 5.5, 4, 20), concrete); footing.position.y = -1.5; g.add(footing);
   const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 8), new THREE.MeshBasicMaterial({ color:0xff2a2a })); beacon.position.y = TOP + 3.8; g.add(beacon);
-  g.position.x = tx; castAll(g); scene.add(g);
+  g.position.x = tx; castAll(g); scene.add(g); torres.push(g);
   for (let k=1;k<=12;k++){
     const ay = TOP - 0.4 - k*0.42;
     for (const dir of [1,-1]) {
@@ -1123,6 +1126,115 @@ function updateSmoke(dt){
   smoke.count = puffs.length; smoke.instanceMatrix.needsUpdate = true;
 }
 
+// ============ Obra por etapas (usada pelo jogo "Construa a ponte") ============
+// p = null → ponte pronta. p de 0 a 8: 0 estudos · 1 canteiros e acessos · 2 fundações · 3 pilares e torres ·
+// 4 viadutos de acesso · 5 vão central estaiado · 6 acabamento e sistemas · 7 inauguração.
+const obra = (() => {
+  const reg = (inst, xs, per = 1) => { inst.computeBoundingSphere?.(); inst.userData.o = inst.instanceMatrix.array.slice(); inst.userData.xs = xs; inst.userData.per = per; return inst; };
+  const pecas = {
+    deck: [reg(mainParts.deck, mainParts.segX), reg(mainParts.edge, mainParts.segX, 2), reg(railParts.deck, railParts.segX), reg(railParts.edge, railParts.segX, 2)],
+    surf: [reg(mainParts.surf, mainParts.segX), reg(railParts.surf, railParts.segX)],
+    cols: [reg(mainParts.colI, mainParts.colX, 2), reg(railParts.colI, railParts.colX, 2)],
+    fim:  [reg(railParts.railI, railParts.segX, 4), reg(marcas.dI, marcas.dX), reg(marcas.bI, marcas.bX), reg(lampI, lampPos.map(l => l[0])), reg(poleI, lampPos.map(l => l[0]))],
+  };
+  function mostrar(inst, fn){
+    const o = inst.userData.o, a = inst.instanceMatrix.array, xs = inst.userData.xs, per = inst.userData.per;
+    for (let i = 0; i < inst.count; i++){
+      const k = fn(xs[Math.floor(i / per)]), j = i * 16;
+      if (k <= 0) a.fill(0, j, j + 16);
+      else { for (let q = 0; q < 16; q++) a[j + q] = o[j + q]; if (k < 1){ a[j + 4] *= k; a[j + 5] *= k; a[j + 6] *= k; } }
+    }
+    inst.instanceMatrix.needsUpdate = true;
+  }
+  // torres: a base fica; o resto (pernas, travessa, topo) sobe
+  const sups = torres.map(g => { const sup = new THREE.Group(); [0, 1, 2, 3, 5].map(i => g.children[i]).forEach(c => sup.add(c)); g.add(sup); return sup; });
+  const estacoes = trainGroup.children.filter(o => o.isMesh && !o.isInstancedMesh);
+  const cabo0 = cableGeo.attributes.position.array.slice();
+  // adereços da obra: boias do traçado, balsas-guindaste, treliças lançadeiras e canteiros
+  const G = new THREE.Group(); G.visible = false; scene.add(G);
+  const amarelo = new THREE.MeshStandardMaterial({ color:0xf2b705, roughness:0.6 }), casco = new THREE.MeshStandardMaterial({ color:0x39424d, roughness:0.8 });
+  const NB = 64, boias = new THREE.InstancedMesh(new THREE.SphereGeometry(1.3, 10, 8), new THREE.MeshBasicMaterial({ color:0xff7a1a }), NB);
+  { const Mb = new THREE.Matrix4(); for (let i = 0; i < NB; i++){ Mb.makeTranslation(-HALF + (i + 0.5) * 2 * HALF / NB, 0.4, 0); boias.setMatrixAt(i, Mb); } }
+  boias.frustumCulled = false; G.add(boias);
+  const balsa = () => { const g = new THREE.Group();
+    const h = new THREE.Mesh(new THREE.BoxGeometry(7, 0.7, 3), casco); h.position.y = 0.15; g.add(h);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.35, 6, 0.35), amarelo); m.position.set(-1.5, 3.4, 0); g.add(m);
+    const l = new THREE.Mesh(new THREE.BoxGeometry(7, 0.25, 0.25), amarelo); l.position.set(1.2, 5.6, 0); l.rotation.z = 0.35; g.add(l);
+    castAll(g); G.add(g); return g; };
+  const balsas = [balsa(), balsa(), balsa(), balsa()];
+  const trelica = () => { const m = new THREE.Mesh(new THREE.BoxGeometry(5, 0.9, 3.6), amarelo); m.castShadow = true; G.add(m); return m; };
+  const trelicas = [trelica(), trelica(), trelica(), trelica()];
+  const canteiro = (x, z) => { const g = new THREE.Group();
+    const piso = new THREE.Mesh(new THREE.BoxGeometry(26, 0.06, 14), new THREE.MeshStandardMaterial({ color:0xb9a88a, roughness:1 })); g.add(piso);
+    [[-7, 3, 8, 1.2, 4], [4, -3, 10, 0.9, 3], [8, 4, 4, 0.7, 3]].forEach(([px, pz, w, hh, d]) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, hh, d), new THREE.MeshStandardMaterial({ color:0xdfe6ea, roughness:0.7 })); b.position.set(px, hh / 2, pz); g.add(b); });
+    const gr = new THREE.Mesh(new THREE.BoxGeometry(0.3, 5, 0.3), amarelo); gr.position.set(-2, 2.5, -4); g.add(gr);
+    const br = new THREE.Mesh(new THREE.BoxGeometry(6, 0.22, 0.22), amarelo); br.position.set(-0.5, 5, -4); g.add(br);
+    g.position.set(x, GROUND + 0.04, z); castAll(g, true); G.add(g); return g; };
+  const canteiros = [canteiro(-HALF - 60, -16), canteiro(HALF + 8, 13)];
+  const cl = THREE.MathUtils.clamp, A = Math.abs, TAIL = MAIN * 2;   // o trecho estaiado vai de -70 a +70
+  let atual = null;
+  function set(p){
+    atual = p;
+    const fim = p == null, st = k => fim ? 1 : cl(p - k, 0, 1);
+    const f0 = st(0), f1 = st(1), f2 = st(2), f3 = st(3), f4 = st(4), f5 = st(5), f6 = st(6), f7 = st(7);
+    const tab = x => {                                  // tabuleiro: 1 = já existe
+      const ax = A(x);
+      if (ax > HALF) return f1 >= 1 - (ax - HALF) / (x < 0 ? 300 : 40) ? 1 : 0;
+      if (ax > TAIL) return f4 > 0 && ax >= HALF - f4 * (HALF - TAIL) ? 1 : 0;
+      return f5 > 0 && A(ax - MAIN) <= f5 * MAIN + 0.01 ? 1 : 0;
+    };
+    const varre = x => A(x) > HALF ? tab(x) : ((x + HALF) / (2 * HALF) <= f6 ? tab(x) : 0);   // acabamento avança de Alcântara para São Luís
+    const pilar = x => {
+      const ax = A(x); if (ax > HALF) return tab(x);
+      if (f2 <= 0 || ax < HALF - f2 * (HALF - MAIN)) return 0;
+      const kf = 4.6 / (deckH(x) + 2.4); return kf + (1 - kf) * f3;
+    };
+    pecas.deck.forEach(i => mostrar(i, tab)); pecas.surf.forEach(i => mostrar(i, varre));
+    pecas.cols.forEach(i => mostrar(i, pilar)); pecas.fim.forEach(i => mostrar(i, x => f6 > 0 ? varre(x) : 0));
+    torres.forEach((g, i) => { g.visible = f2 > 0.55; sups[i].visible = f3 > 0; sups[i].scale.y = Math.max(f3, 0.001); });
+    { const a = cableGeo.attributes.position.array, lim = f5 * 12;
+      for (let j = 0; j < a.length / 6; j++){ const k = Math.floor((j % 48) / 4) + 1, on = fim || k <= lim;
+        for (let q = 0; q < 6; q++) a[j * 6 + q] = on ? cabo0[j * 6 + q] : 0; }
+      cableGeo.attributes.position.needsUpdate = true; }
+    estacoes.forEach(o => { o.visible = f6 > 0.5; });
+    trainMesh.visible = cars.visible = trucks.visible = f7 > 0;
+    // adereços
+    G.visible = !fim && p < 7.6;
+    if (G.visible){
+      boias.count = Math.round(f0 * NB); boias.visible = p < 4.2;
+      const frente = HALF - f2 * (HALF - MAIN);
+      balsas[0].position.set(-frente, 0, 7); balsas[1].position.set(frente, 0, -7);
+      balsas[0].visible = balsas[1].visible = p > 2 && p < 3;
+      balsas[2].position.set(-MAIN, 0, 11); balsas[3].position.set(MAIN, 0, -11);
+      balsas[2].visible = balsas[3].visible = p > 2.5 && p < 6;
+      const fr4 = HALF - f4 * (HALF - TAIL);
+      trelicas.forEach((t, i) => {
+        const s = i % 2 ? 1 : -1;
+        if (p < 5){ t.visible = i < 2 && p > 4; t.position.set(s * fr4, deckH(fr4) + 0.6, 0.6); }
+        else { t.visible = p < 6; const x = (i < 2 ? -MAIN : MAIN) + s * f5 * MAIN; t.position.set(x, deckH(x) + 0.6, 0.6); }
+      });
+      canteiros.forEach(c => { c.visible = f1 > 0.25; });
+    }
+  }
+  const vistas = [
+    { pos:[200, 760, 1400], target:[0, 0, 0] },
+    { pos:[-HALF + 90, 90, 170], target:[-HALF - 70, 1, 0] },
+    { pos:[-HALF - 45, 16, 62], target:[-HALF + 25, 2, 0] },
+    { pos:[-MAIN - 70, 26, 95], target:[-MAIN, 11, 0] },
+    { pos:[-HALF - 45, 20, 62], target:[-HALF + 25, 4, 0] },
+    { pos:[95, 30, 105], target:[0, 12, 0] },
+    { pos:[-55, 14.5, 26], target:[10, 8.5, 0] },
+  ];
+  function vista(i, dur){ if (i >= 7) { setView('sobrevoo'); return; } if (mode !== 'livre') setView('livre'); const v = vistas[i]; flyTo(v.pos, v.target, dur); }
+  // nas fundações e nos viadutos a câmera acompanha a frente de obra (lado de Alcântara)
+  function acompanhar(p){
+    const s = Math.floor(p), f = p - s; if (s !== 2 && s !== 4 || mode !== 'livre') return;
+    const x = -(HALF - f * (HALF - (s === 2 ? MAIN : TAIL))), y = s === 2 ? 0 : deckH(x) - 2;
+    fly = null; controls.target.set(x + 25, 2 + y, 0); camera.position.set(x - 45, (s === 2 ? 16 : 20) + y, 62);
+  }
+  return { set, vista, acompanhar, get: () => atual, trafego: k => { cars.count = Math.round(cl(k, 0.08, 1) * N_CARS); trucks.count = Math.round(cl(k, 0.1, 1) * N_TRUCKS); } };
+})();
+
 // ============ Loop ============
 const clock = new THREE.Clock();
 const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), S1 = V3(1,1,1);
@@ -1240,12 +1352,13 @@ setTimeout(hideLoading, 2500);
     addEventListener('keydown', e => { if (e.key === 'Escape' && intro.isConnected) fechar(); });
   }
 }
-window.__cena = { scene, camera, controls, setView, renderer, render: () => { controls.update(); sky.position.copy(camera.position); updateShadow(); for (const [o, md] of labels) o.visible = camera.position.distanceTo(o.position) < md; renderer.render(scene, camera); labelRenderer.render(scene, camera); },
+window.__cena = { scene, camera, controls, setView, renderer, obra, trem: trainGroup, render: () => { controls.update(); sky.position.copy(camera.position); updateShadow(); for (const [o, md] of labels) o.visible = camera.position.distanceTo(o.position) < md; renderer.render(scene, camera); labelRenderer.render(scene, camera); },
   launch: () => btnL.onclick(), step: dt => { updateLaunch(dt); updateSmoke(dt); } };
 addEventListener('resize', () => {
   camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight);
 });
 </script>
+<script type="module" src="jogo.js"></script>
 </body>
 </html>
