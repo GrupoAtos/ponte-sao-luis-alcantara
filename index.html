@@ -54,6 +54,7 @@
     background:rgba(0,0,0,.55); white-space:nowrap; pointer-events:none; }
   .label.big { font-size:14px; background:rgba(255,179,71,.9); color:#1a1a1a; }
   .label.rail { background:rgba(200,107,60,.92); }
+  .label.agua { background:rgba(24,96,140,.9); }
   .label.road { background:rgba(40,60,80,.85); font-weight:500; }
   .label.cla { background:rgba(30,60,110,.9); }
   .label.metro { background:rgba(30,91,216,.92); }
@@ -107,6 +108,7 @@
 <script src="cena.js"></script>
 <script src="cla.js"></script>
 <script src="metro.js"></script>
+<script src="lagoa.js"></script>
 <script src="visitas.js" data-pagina="maquete" defer></script>
 <script type="importmap">
 { "imports": {
@@ -373,12 +375,19 @@ C.ilhas.forEach(paintLand);
     gctx.fillStyle = g; gctx.beginPath(); gctx.arc(u, v, rad, 0, Math.PI*2); gctx.fill();
   }
   gctx.globalCompositeOperation = 'source-over'; }
+// Lagoa da Jansen: margem pintada e espelho d'água recortado do terreno (aparece a água de baixo)
+const lagoaRing = window.LAGOA.contorno.map(([la, lo]) => LL(la, lo));
+const LAGOA_C = lagoaRing.reduce((s, p) => [s[0] + p[0]/lagoaRing.length, s[1] + p[1]/lagoaRing.length], [0, 0]);
+{ tracePath(lagoaRing, true); gctx.lineJoin = 'round';
+  gctx.strokeStyle = 'rgba(38,70,44,.85)'; gctx.lineWidth = 6; gctx.stroke(); gctx.strokeStyle = '#d6c697'; gctx.lineWidth = 2.5; gctx.stroke();
+  gctx.globalCompositeOperation = 'destination-out'; gctx.fillStyle = '#000'; gctx.fill(); gctx.globalCompositeOperation = 'source-over'; }
 const groundTex = new THREE.CanvasTexture(gcv);
 groundTex.colorSpace = THREE.SRGBColorSpace; groundTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(GSIZE, GSIZE), new THREE.MeshStandardMaterial({ map:groundTex, alphaTest:0.5, roughness:0.95 }));
 ground.rotation.x = -Math.PI/2; ground.position.y = GROUND; ground.receiveShadow = true; scene.add(ground);
 
 function inside(pt, ring){
+  if (ring === ringSL && inside(pt, lagoaRing)) return false;   // nada de árvore ou casa dentro da lagoa
   let ins = false;
   for (let i=0, j=ring.length-1; i<ring.length; j=i++){
     const [xi, zi] = ring[i], [xj, zj] = ring[j];
@@ -880,6 +889,7 @@ addLabel('Anel do Contorno · MA‑106', V3(P.anel[0], 6, P.anel[1]), 'road', sc
 addLabel('Via nova · 2,8 km', V3((P.anel[0] - HALF - 30)/2, 5, P.anel[1]/2), 'road', scene, 1800);
 addLabel('Vão de navegação · 700 m · 80 m livres', V3(0, TOP + 9, 0));
 addLabel('Baía de São Marcos', V3(-200, 4, -SIDE*260));
+addLabel('Lagoa da Jansen', V3(LAGOA_C[0], 3, LAGOA_C[1]), 'agua', scene, 1400);
 addLabel('Centro histórico de São Luís', V3(P.centroSL[0], 12, P.centroSL[1]));
 
 // ============ Tráfego ============
@@ -965,6 +975,7 @@ const LUGARES = [
   ['São Luís · Ponta d\'Areia (cabeceira)', HALF, 0, 260],
   ['Av. dos Holandeses (MA‑203)', P.holandeses[0], P.holandeses[1], 320],
   ['Centro histórico de São Luís', P.centroSL[0], P.centroSL[1], 300],
+  ['Lagoa da Jansen', LAGOA_C[0], LAGOA_C[1], 330],
   ['Av. Metropolitana', METC[0], METC[1], 1900],
   ['Porto do Itaqui', ITQ[0], ITQ[1], 600],
   ['Alcântara · cabeceira', -HALF, 0, 260],
