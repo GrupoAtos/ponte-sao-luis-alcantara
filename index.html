@@ -3,7 +3,34 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ponte São Luís–Alcântara</title>
+<title>Ponte São Luís–Alcântara: maquete 3D da ponte para a Baixada Maranhense</title>
+<meta name="description" content="Conheça em 3D a proposta de ponte rodoferroviária sobre a Baía de São Marcos, ligando São Luís a Alcântara e à Baixada Maranhense em cerca de 15 minutos. Iniciativa popular: veja o estudo e deixe seu apoio.">
+<link rel="canonical" href="https://pontesaoluisbaixada.com.br/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Paulo Serra">
+<meta name="geo.region" content="BR-MA">
+<meta name="geo.placename" content="São Luís, Maranhão">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Ponte São Luís–Baixada">
+<meta property="og:title" content="Ponte São Luís–Alcântara: maquete 3D da ponte para a Baixada Maranhense">
+<meta property="og:description" content="Conheça em 3D a proposta de ponte rodoferroviária sobre a Baía de São Marcos, ligando São Luís a Alcântara e à Baixada Maranhense em cerca de 15 minutos. Iniciativa popular: veja o estudo e deixe seu apoio.">
+<meta property="og:url" content="https://pontesaoluisbaixada.com.br/">
+<meta property="og:image" content="https://pontesaoluisbaixada.com.br/midia/capa.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ponte São Luís–Alcântara: maquete 3D da ponte para a Baixada Maranhense">
+<meta name="twitter:description" content="Conheça em 3D a proposta de ponte rodoferroviária sobre a Baía de São Marcos, ligando São Luís a Alcântara e à Baixada Maranhense em cerca de 15 minutos. Iniciativa popular: veja o estudo e deixe seu apoio.">
+<meta name="twitter:image" content="https://pontesaoluisbaixada.com.br/midia/capa.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b1620'/%3E%3Cpath d='M6 44h52M20 44V14M44 44V14M20 16L6 42M20 16l12 26M44 16L32 42M44 16l14 26' stroke='%23ffb347' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"WebSite","@id":"https://pontesaoluisbaixada.com.br/#site","url":"https://pontesaoluisbaixada.com.br/","name":"Ponte São Luís–Baixada","alternateName":["Ponte São Luís–Alcântara","Ponte da Baía de São Marcos"],"inLanguage":"pt-BR","description":"Iniciativa popular por uma ponte rodoferroviária entre São Luís e Alcântara, ligando a capital à Baixada Maranhense."},
+ {"@type":"WebPage","@id":"https://pontesaoluisbaixada.com.br/#maquete","url":"https://pontesaoluisbaixada.com.br/","name":"Ponte São Luís–Alcântara: maquete 3D da ponte para a Baixada Maranhense","isPartOf":{"@id":"https://pontesaoluisbaixada.com.br/#site"},"inLanguage":"pt-BR","primaryImageOfPage":"https://pontesaoluisbaixada.com.br/midia/capa.jpg",
+  "about":[{"@type":"Place","name":"Baía de São Marcos"},{"@type":"City","name":"São Luís","containedInPlace":{"@type":"State","name":"Maranhão"}},{"@type":"City","name":"Alcântara"},{"@type":"Place","name":"Baixada Maranhense"}],
+  "author":{"@type":"Person","name":"Paulo Serra"}},
+ {"@type":"VideoObject","name":"Ponte São Luís–Alcântara: resumo do estudo","description":"Vídeo de 1min40 com o traçado, o orçamento estimado, os tempos de travessia e os casos no mundo.","thumbnailUrl":"https://pontesaoluisbaixada.com.br/midia/capa.jpg","contentUrl":"https://pontesaoluisbaixada.com.br/midia/estudo.mp4","uploadDate":"2026-11-12","duration":"PT1M40S"}
+]}
+</script>
 <style>
   :root { --bg:#0b1620; --panel:rgba(10,20,30,.80); --text:#eef4f8; --muted:#9db3c4; --accent:#ffb347; --rail:#c86b3c; }
   html,body { margin:0; height:100%; overflow:hidden; background:var(--bg); color:var(--text);
@@ -50,6 +77,26 @@
   @media (max-width:1150px){ #irpara { left:382px; transform:none; } #irpara select { max-width:calc(100vw - 560px); } #dica { left:382px; transform:none; } }
   #dica { position:fixed; left:50%; bottom:64px; transform:translateX(-50%); background:var(--panel); border-radius:8px; padding:6px 12px;
     font-size:12px; color:var(--muted); transition:opacity .8s; pointer-events:none; white-space:nowrap; }
+  #apoiar { position:fixed; left:50%; bottom:22px; transform:translateX(-50%); z-index:5; display:flex; align-items:center; gap:10px;
+    background:#e2711d; color:#fff; font-weight:700; font-size:15px; text-decoration:none; padding:12px 20px; border-radius:999px;
+    box-shadow:0 6px 22px rgba(0,0,0,.4); border:2px solid rgba(255,255,255,.35); white-space:nowrap; }
+  #apoiar:hover { background:#f08a35; }
+  #apoiar small { font-weight:500; font-size:12px; opacity:.92; border-left:1px solid rgba(255,255,255,.45); padding-left:10px; }
+  @media (max-width:1150px){ #apoiar { left:auto; right:100px; bottom:84px; transform:none; } #dica { display:none; } }
+  #intro { position:fixed; inset:0; z-index:9; display:grid; place-items:center; padding:16px; background:rgba(5,12,20,.62); backdrop-filter:blur(3px); overflow:auto; transition:opacity .4s; }
+  #intro .cx { max-width:600px; background:#0f1d2b; border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:26px 26px 22px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+  #intro .kick { color:var(--accent); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+  #intro h1 { font-size:28px; line-height:1.15; margin:6px 0 10px; }
+  #intro p { font-size:15px; line-height:1.5; color:#d5e0e8; margin:0 0 12px; }
+  #intro ul { list-style:none; display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:0; margin:14px 0; }
+  #intro li { background:rgba(255,255,255,.06); border-radius:10px; padding:10px; font-size:12px; color:var(--muted); }
+  #intro li b { display:block; font-size:20px; color:#fff; }
+  #intro .aviso { font-size:12.5px; color:var(--muted); border-left:3px solid var(--accent); padding-left:10px; }
+  #intro .acoes { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  #intro .acoes a, #intro .acoes button { font-size:15px; font-weight:700; padding:12px 18px; border-radius:10px; border:0; cursor:pointer; text-decoration:none; }
+  #intro .pri { background:var(--accent); color:#1a1a1a; } #intro .apo { background:#e2711d; color:#fff; } #intro .sec { background:#1d3346; color:var(--text); }
+  #intro .cont { font-size:12px; color:var(--muted); margin:14px 0 0; }
+  @media (max-width:600px){ #intro h1 { font-size:22px; } #intro .cx { padding:20px 18px; } #apoiar { right:auto; left:16px; bottom:22px; font-size:14px; padding:10px 14px; } #apoiar small { display:none; } }
   #carregando { position:fixed; inset:0; display:grid; place-items:center; background:var(--bg); z-index:10; font-size:14px;
     color:var(--muted); transition:opacity .6s; }
   #carregando b { display:block; color:var(--text); font-size:18px; margin-bottom:6px; text-align:center; }
@@ -60,6 +107,7 @@
 <script src="cena.js"></script>
 <script src="cla.js"></script>
 <script src="metro.js"></script>
+<script src="visitas.js" data-pagina="maquete" defer></script>
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
@@ -126,11 +174,33 @@
 
   <div class="btns" style="margin-top:12px"><a class="link" href="estudo.html" target="_blank">Abrir estudo: orçamento, economia e casos no mundo →</a> <a class="link" href="estudo.html#video" target="_blank">▶ Assistir ao vídeo do estudo</a> <a class="link" href="apoie.html" target="_blank" style="background:#c4651f">♥ Apoie a ponte</a></div>
   <p class="note"><b>Iniciativa popular</b>, sem vínculo com governos ou prefeituras. Ideia: PAULO SERRA. Maquete, estudo e vídeo feitos com inteligência artificial, pelo Claude (Anthropic).</p>
+  <p class="note" data-quando-contar hidden><b><span data-n="visitantes">0</span></b> visitantes no site · <b><span data-n="hoje">0</span></b> hoje · <b><span data-n="apoios">0</span></b> apoios</p>
   <p class="note"><b>Navegação:</b> arraste para mover o mapa · botão direito (ou Ctrl + arrastar, ou dois dedos) para girar e inclinar · roda ou pinça para zoom, no ponto do cursor · duplo clique para aproximar ali · teclado: setas/WASD movem, Q/E giram, +/− zoom, N norte, T vista de cima.<br>
   Litoral, ruas, trilhos e prédios © OpenStreetMap (ODbL). Alturas de prédios sem dado no OSM são estimadas.
   Maquete conceitual — não é projeto de engenharia.</p>
 </div>
 <button id="hide">Ocultar painel</button>
+<a id="apoiar" href="apoie.html">♥ Apoie a ponte <small data-quando-contar hidden><span data-n="apoios">0</span> apoios</small></a>
+<div id="intro" role="dialog" aria-labelledby="introT">
+  <div class="cx">
+    <div class="kick">Iniciativa popular · Maranhão</div>
+    <h1 id="introT">Uma ponte entre São Luís e a Baixada Maranhense</h1>
+    <p>Esta é uma proposta de <b>ponte rodoferroviária de 12,7 km sobre a Baía de São Marcos</b>, ligando São Luís a Alcântara. A travessia que hoje leva de 1h20 a mais de 3 horas de ferryboat passaria a levar cerca de 15 minutos, de carro ou de trem.</p>
+    <ul>
+      <li><b>12,7 km</b>sobre a água</li>
+      <li><b>~15 min</b>de São Luís a Alcântara</li>
+      <li><b>R$ 13–18 bi</b>custo estimado</li>
+    </ul>
+    <p>Aqui você explora a ponte numa <b>maquete 3D</b>, lê o <b>estudo</b> de custo e impacto econômico e <b>deixa seu apoio</b>.</p>
+    <p class="aviso">Não é um projeto do governo nem das prefeituras. É um desejo da população, apresentado para chamar a atenção dos governos estadual e federal, das prefeituras e de investidores. Feito com inteligência artificial (Claude, da Anthropic). Ideia: PAULO SERRA.</p>
+    <div class="acoes">
+      <button class="pri" id="introOk">Explorar a maquete 3D</button>
+      <a class="apo" href="apoie.html">♥ Apoiar a ponte</a>
+      <a class="sec" href="estudo.html">Ler o estudo</a>
+    </div>
+    <p class="cont" data-quando-contar hidden><span data-n="visitantes">0</span> visitantes · <span data-n="apoios">0</span> apoios até agora</p>
+  </div>
+</div>
 <div id="irpara"><label for="lugar">Ir para</label><select id="lugar"><option value="">Escolha um lugar…</option></select></div>
 <div id="nav">
   <button id="zIn" title="Aproximar (+)">+</button>
@@ -1159,6 +1229,17 @@ function animate(){
 function hideLoading(){ const c = document.getElementById('carregando'); if (!c) return; c.style.opacity = 0; setTimeout(() => c.remove(), 700); }
 animate();
 setTimeout(hideLoading, 2500);
+{
+  const intro = document.getElementById('intro');
+  const fechar = () => { intro.style.opacity = 0; setTimeout(() => intro.remove(), 400); try { sessionStorage.setItem('introVisto', '1'); } catch {} };
+  let visto = false; try { visto = sessionStorage.getItem('introVisto') === '1'; } catch {}
+  if (visto) intro.remove();
+  else {
+    document.getElementById('introOk').onclick = fechar;
+    intro.addEventListener('click', e => { if (e.target === intro) fechar(); });
+    addEventListener('keydown', e => { if (e.key === 'Escape' && intro.isConnected) fechar(); });
+  }
+}
 window.__cena = { scene, camera, controls, setView, renderer, render: () => { controls.update(); sky.position.copy(camera.position); updateShadow(); for (const [o, md] of labels) o.visible = camera.position.distanceTo(o.position) < md; renderer.render(scene, camera); labelRenderer.render(scene, camera); },
   launch: () => btnL.onclick(), step: dt => { updateLaunch(dt); updateSmoke(dt); } };
 addEventListener('resize', () => {
